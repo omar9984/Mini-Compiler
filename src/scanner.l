@@ -14,17 +14,17 @@
 %%
 [a-z] {
 	yylval = *yytext - 'a';
-	return Var;
+	return VAR;
 }
 [0-9]+ 	{
 			yylval = atoi(yytext);
-			return Integer;
+			return INT;
 		}
-"+" TOKEN(Plus)
-"-" {return Minus;}
-"*" {return Mult;}
-"/" {return Div;}
-"^" {return Power;}
+"+" TOKEN(PLUS)
+"-" {return MINUS;}
+"*" {return MULT;}
+"/" {return DIV;}
+"^" {return POW;}
 [-+()=\n] return *yytext;
 [ \t]  ; /* skip whitespace */
 

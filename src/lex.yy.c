@@ -736,7 +736,7 @@ YY_RULE_SETUP
 #line 15 "scanner.l"
 {
 	yylval = *yytext - 'a';
-	return Var;
+	return VAR;
 }
 	YY_BREAK
 case 2:
@@ -744,33 +744,33 @@ YY_RULE_SETUP
 #line 19 "scanner.l"
 {
 			yylval = atoi(yytext);
-			return Integer;
+			return INT;
 		}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 23 "scanner.l"
-TOKEN(Plus)
+TOKEN(PLUS)
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 24 "scanner.l"
-{return Minus;}
+{return MINUS;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 25 "scanner.l"
-{return Mult;}
+{return MULT;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 26 "scanner.l"
-{return Div;}
+{return DIV;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 27 "scanner.l"
-{return Power;}
+{return POW;}
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
