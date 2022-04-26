@@ -672,7 +672,7 @@ YY_DECL
 		}
 
 	{
-#line 14 "scanner.l"
+#line 16 "scanner.l"
 
 #line 677 "lex.yy.c"
 
@@ -733,7 +733,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 15 "scanner.l"
+#line 17 "scanner.l"
 {
 	yylval = *yytext - 'a';
 	return VAR;
@@ -741,7 +741,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 "scanner.l"
+#line 21 "scanner.l"
 {
 			yylval = atoi(yytext);
 			return INT;
@@ -749,43 +749,43 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 23 "scanner.l"
+#line 25 "scanner.l"
 TOKEN(PLUS)
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 24 "scanner.l"
+#line 26 "scanner.l"
 {return MINUS;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 25 "scanner.l"
+#line 27 "scanner.l"
 {return MULT;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 26 "scanner.l"
+#line 28 "scanner.l"
 {return DIV;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 27 "scanner.l"
+#line 29 "scanner.l"
 {return POW;}
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 28 "scanner.l"
+#line 30 "scanner.l"
 return *yytext;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 29 "scanner.l"
+#line 31 "scanner.l"
 ; /* skip whitespace */
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 31 "scanner.l"
+#line 33 "scanner.l"
 ECHO;
 	YY_BREAK
 #line 791 "lex.yy.c"
@@ -1793,7 +1793,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 31 "scanner.l"
+#line 33 "scanner.l"
 
 int yywrap(void){
 	return 1;

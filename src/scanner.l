@@ -10,7 +10,9 @@
 #define TOKEN(t) return(t);
 #endif
 %}
-
+DIGIT [0-9]
+LETTER [a-zA-Z_]
+VAR {LETTER}({LETTER} | {DIGIT})* 
 %%
 [a-z] {
 	yylval = *yytext - 'a';

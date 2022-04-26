@@ -1,0 +1,24 @@
+
+# variables
+- name : start with letter and can have _ a-z
+- 
+
+
+# Types
+void: is only valid as a function return type to tell that it has no value to return.
+int: is an integer numeric value data type.
+char: is a character value data type.
+bool: is a Boolean value data type that accepts either true or false.
+
+# if-elif-else like in the python
+if (a == 1){
+    
+}
+
+elif (a == 2){
+
+}
+else{
+
+}
+
