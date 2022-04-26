@@ -11,24 +11,44 @@
 #endif
 %}
 DIGIT [0-9]
-LETTER [a-zA-Z_]
+LETTER [a-zA-Z_$]
 VAR {LETTER}({LETTER} | {DIGIT})* 
+CHAR (\'.\')
+
 %%
-[a-z] {
-	yylval = *yytext - 'a';
-	return VAR;
-}
-[0-9]+ 	{
-			yylval = atoi(yytext);
+
+
+"if"      return IF;
+"elif"      return ELIF;
+"else"    return ELSE;
+"while"	  return WHILE;
+"for"     return FOR;
+"switch"  return SWITCH;
+"case"    return CASE;
+"default" return DEFAULT;
+"break"   return BREAK;
+"repeat"  return REPEAT;
+"until"   return UNTIL;
+
+
+
+
+
+DIGIT+ 	{
+		//	yylval = atoi(yytext);
 			return INT;
 		}
 "+" TOKEN(PLUS)
-"-" {return MINUS;}
-"*" {return MULT;}
-"/" {return DIV;}
-"^" {return POW;}
-[-+()=\n] return *yytext;
+"-" TOKEN(MINUS)
+"*" TOKEN(MULT)
+"/" TOKEN(DIV)
+"=" TOKEN(EQUAL)
+[-+()\n] return *yytext;
 [ \t]  ; /* skip whitespace */
+VAR {
+	// yylval = *yytext - 'a';
+	return VAR;
+}
 
 %%
 int yywrap(void){

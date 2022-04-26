@@ -55,13 +55,26 @@ extern int yydebug;
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
     INT = 258,                     /* INT  */
-    PLUS = 259,                    /* PLUS  */
-    MINUS = 260,                   /* MINUS  */
-    MULT = 261,                    /* MULT  */
-    DIV = 262,                     /* DIV  */
-    POW = 263,                     /* POW  */
+    CHAR = 259,                    /* CHAR  */
+    PLUS = 260,                    /* PLUS  */
+    MINUS = 261,                   /* MINUS  */
+    MULT = 262,                    /* MULT  */
+    DIV = 263,                     /* DIV  */
     VAR = 264,                     /* VAR  */
-    Minus = 265                    /* Minus  */
+    EQUAL = 265,                   /* EQUAL  */
+    Minus = 266,                   /* Minus  */
+    POW = 267,                     /* POW  */
+    IF = 268,                      /* IF  */
+    ELIF = 269,                    /* ELIF  */
+    ELSE = 270,                    /* ELSE  */
+    FOR = 271,                     /* FOR  */
+    WHILE = 272,                   /* WHILE  */
+    REPEAT = 273,                  /* REPEAT  */
+    UNTIL = 274,                   /* UNTIL  */
+    SWITCH = 275,                  /* SWITCH  */
+    CASE = 276,                    /* CASE  */
+    BREAK = 277,                   /* BREAK  */
+    DEFAULT = 278                  /* DEFAULT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

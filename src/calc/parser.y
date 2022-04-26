@@ -4,19 +4,11 @@
 	void yyerror(char*);
 	int sym[26];
 %}
-// data types
-%token INT CHAR
-// operators 
-%token  PLUS MINUS MULT DIV  VAR EQUAL
-//  operator's associativity 
+
+%token INT PLUS MINUS MULT DIV POW VAR
 %left PLUS Minus
 %left MULT DIV
 %right POW
-
-// the control  structures
-
-%token IF ELIF ELSE  FOR  WHILE REPEAT UNTIL  SWITCH CASE BREAK DEFAULT      // Keywords
-
 %%
 program:
 	program statement '\n'
