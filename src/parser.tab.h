@@ -60,25 +60,26 @@ extern int yydebug;
     MULT = 261,                    /* MULT  */
     DIV = 262,                     /* DIV  */
     VAR = 263,                     /* VAR  */
-    POW = 264,                     /* POW  */
-    IF = 265,                      /* IF  */
-    ELIF = 266,                    /* ELIF  */
-    ELSE = 267,                    /* ELSE  */
-    FOR = 268,                     /* FOR  */
-    WHILE = 269,                   /* WHILE  */
-    REPEAT = 270,                  /* REPEAT  */
-    UNTIL = 271,                   /* UNTIL  */
-    SWITCH = 272,                  /* SWITCH  */
-    CASE = 273,                    /* CASE  */
-    BREAK = 274,                   /* BREAK  */
-    DEFAULT = 275,                 /* DEFAULT  */
-    TYPE_INT = 276,                /* TYPE_INT  */
-    TYPE_CHAR = 277,               /* TYPE_CHAR  */
-    TYPE_CONST = 278,              /* TYPE_CONST  */
-    TYPE_BOOL = 279,               /* TYPE_BOOL  */
-    CONST_INT = 280,               /* CONST_INT  */
-    CONST_FALSE = 281,             /* CONST_FALSE  */
-    CONST_TRUE = 282               /* CONST_TRUE  */
+    ENDL = 264,                    /* ENDL  */
+    POW = 265,                     /* POW  */
+    IF = 266,                      /* IF  */
+    ELIF = 267,                    /* ELIF  */
+    ELSE = 268,                    /* ELSE  */
+    FOR = 269,                     /* FOR  */
+    WHILE = 270,                   /* WHILE  */
+    REPEAT = 271,                  /* REPEAT  */
+    UNTIL = 272,                   /* UNTIL  */
+    SWITCH = 273,                  /* SWITCH  */
+    CASE = 274,                    /* CASE  */
+    BREAK = 275,                   /* BREAK  */
+    DEFAULT = 276,                 /* DEFAULT  */
+    TYPE_INT = 277,                /* TYPE_INT  */
+    TYPE_CHAR = 278,               /* TYPE_CHAR  */
+    TYPE_CONST = 279,              /* TYPE_CONST  */
+    TYPE_BOOL = 280,               /* TYPE_BOOL  */
+    CONST_INT = 281,               /* CONST_INT  */
+    CONST_FALSE = 282,             /* CONST_FALSE  */
+    CONST_TRUE = 283               /* CONST_TRUE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

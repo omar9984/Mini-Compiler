@@ -3,9 +3,10 @@
 	int yylex(void);
 	void yyerror(char*);
 	int sym[26];
+	#define debug 1
+	int i;
 %}
-
-%token EQUAL PLUS MINUS MULT DIV  VAR
+%token EQUAL PLUS MINUS MULT DIV  VAR ENDL
 %left PLUS MINUS
 %left MULT DIV
 %right POW
@@ -20,19 +21,22 @@ program:
 	program statement '\n' {printf("matched okay\n");}
 	| 
 	;
-statement: 
-	expr	{  }
-	| VAR '=' expr {}
+statement:
+
+	| expr {  }
+	| VAR '=' expr   { if(debug){printf("%d typing VAR=expr \n", i++);} }
+	| typing VAR   { if(debug){printf("%d typing VAR \n", i++);}  }
+	| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
+	| VAR EQUAL expr {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	;
 expr:
-	CONST_INT	{ }
-	| typing VAR { printf("this is declaration"); }
-	| VAR EQUAL const_val {}
-	| expr PLUS expr {  }
-	| expr MINUS expr {}
-	| expr MULT expr { }
-	| expr DIV expr {}
-	| '(' expr ')' {  }
+	const_val	{if(debug){printf("%d const_val \n", i++);} }	
+	| VAR	{if(debug){printf("%d VAR \n", i++);} }	
+	| expr PLUS expr { if(debug){printf("%d expr + expr  \n", i++);} }
+	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}}
+	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}}
+	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}}
+	| '(' expr ')' {if(debug){printf("%d (expr) \n", i++);}  }
 	;
 const_val:
 	CONST_FALSE

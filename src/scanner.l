@@ -65,7 +65,10 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 "/" {return DIV;}
 [-+()=\n] return *yytext;
 [ \t]  ; /* skip whitespace */
-
+";" {return ENDL;}
+.   {
+		yyerror("Unknown character");
+	} 
 %%
 int yywrap(void){
 	return 1;
