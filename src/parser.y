@@ -44,11 +44,27 @@ statement:
 	| IF  '('expr')' if_block ELIF   '('expr')' if_block  {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
 	| WHILE '('expr')' if_block  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 	| REPEAT if_block UNTIL  '('expr')'  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
+	| FOR '(' for_inital ENDL for_condition  ENDL for_inc ')' if_block  { if(debug){printf("%d for loop  expr  \n", i++);} }
 	| SWITCH '('expr')' '{' switch_block '}'   {if(debug){printf("%dswitch  expr  \n", i++);} }
 	| '{' block_statements '}' { if(debug){printf("%d {  } \n", i++);} }
+	| '{''}'
 	;
-// CASE const_val: case_block switch_block { if(debug){printf("%d {  } \n", i++);} }
 
+// for part
+
+for_inital:
+	VAR EQUAL expr
+	|
+	;
+for_condition:
+	expr
+	|
+	;
+for_inc:
+	VAR EQUAL expr
+	|
+	;
+// switch case part
 switch_block:
 		case_block switch_block { if(debug){printf("%d {  } \n", i++);} }
 	   | DEFAULT ':' case_statement	 { if(debug){printf("%d {  } \n", i++);} }
@@ -65,7 +81,7 @@ case_block:
 	CASE const_val ':' case_statement {  if(debug){printf("%dcase_block statement break;\n", i++);} }
 	;
 
-
+// if block can also be used for FOR , WHILE , REPEAT UNTIL
 if_block:
 	'{' block_statements '}' |
 	'{' '}';
