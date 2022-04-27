@@ -32,7 +32,7 @@ block_code:
 	statement;
 // this is the main building block of our program
 statement:
-	'\n'
+	'\n' {}
 	| expr ENDL {}
 	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
 	| typing VAR   ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
@@ -40,11 +40,15 @@ statement:
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block ELSE if_block   {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
-	| IF  '('expr')' if_block ELIF if_block ELSE if_block   {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
+	| IF  '('expr')' if_block ELIF   '('expr')' if_block ELSE if_block   {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
+	| IF  '('expr')' if_block ELIF   '('expr')' if_block  {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
+	| WHILE '('expr')' if_block  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
+	| REPEAT if_block UNTIL  '('expr')'  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 	| '{' block_statements '}' { if(debug){printf("%d {  } \n", i++);} }
 	;
 if_block:
-	'{' block_statements '}' ;
+	'{' block_statements '}' |
+	'{' '}';
 
 
 block_statements:
