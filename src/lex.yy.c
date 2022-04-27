@@ -388,7 +388,7 @@ static const YY_CHAR yy_ec[256] =
 
        16,   17,   11,   18,   19,   11,   20,   21,   11,   22,
        23,   24,   11,   25,   26,   27,   28,   11,   29,   11,
-       11,   11,    1,    1,    1,    1,    1,    1,    1,    1,
+       11,   11,    4,    1,    4,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -932,7 +932,7 @@ case 27:
 YY_RULE_SETUP
 #line 70 "scanner.l"
 {
-		yyerror("Unknown character");
+		perror("Unknown character");
 	} 
 	YY_BREAK
 case 28:

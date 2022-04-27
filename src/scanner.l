@@ -63,11 +63,11 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 "-" { return MINUS;}
 "*" {return MULT;}
 "/" {return DIV;}
-[-+()=\n] return *yytext;
+[-+()=\n{}] return *yytext;
 [ \t]  ; /* skip whitespace */
 ";" {return ENDL;}
 .   {
-		yyerror("Unknown character");
+		perror("Unknown character");
 	} 
 %%
 int yywrap(void){

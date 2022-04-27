@@ -18,17 +18,22 @@
 %token CONST_INT CONST_FALSE CONST_TRUE
 %%
 program:
-	program statement '\n' {printf("matched okay\n");}
-	| 
+	program block_code {printf("matched okay\n");}
+	|
 	;
+block_code:
+	statement;
+// this is the main building block of our program
 statement:
-
-	| expr {  }
-	| VAR '=' expr   { if(debug){printf("%d typing VAR=expr \n", i++);} }
-	| typing VAR   { if(debug){printf("%d typing VAR \n", i++);}  }
+	'\n'
+	| expr ENDL {}
+	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
+	| typing VAR   ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
 	| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
-	| VAR EQUAL expr {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
+	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
+	| '{' program '}' {if(debug){printf("%d {  } \n", i++);} }
 	;
+// expr is anything that can appear on the right hand side of expression
 expr:
 	const_val	{if(debug){printf("%d const_val \n", i++);} }	
 	| VAR	{if(debug){printf("%d VAR \n", i++);} }	
