@@ -11,7 +11,7 @@
 #endif
 %}
 DIGIT [0-9]
-LETTER [a-zA-Z_]
+LETTER [a-zA-Z_$]
 VARNAME {LETTER}({LETTER}|{DIGIT})*
 %%
 
@@ -40,12 +40,6 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 
 %{
 // logical operators
-// 
-// "==" return LOGIC_EQUAL_EQUAL;
-// "<" return LOGIC_LESS;
-// "<=" return LOGIC_LESS_EQUAL;
-// ">" return LOGIC_GREATER;
-// ">=" return LOGIC_GREATER_EQUAL;
 %}
 
 
@@ -81,7 +75,6 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 %}
 
  {VARNAME}   {
-	// yylval = *yytext - 'a';
 	return VAR;
 }
 [0-9]+ 	{
@@ -94,7 +87,8 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 [ \t]  ; /* skip whitespace */
 ";" {return ENDL;}
 .   {
-		perror("Unknown character");
+		printf("unknown %c", *yytext);
+		perror("Unknown character ");
 	} 
 %%
 int yywrap(void){
