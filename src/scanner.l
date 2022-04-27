@@ -39,6 +39,36 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 "const"  return TYPE_CONST;
 
 %{
+// logical operators
+// 
+// "==" return LOGIC_EQUAL_EQUAL;
+// "<" return LOGIC_LESS;
+// "<=" return LOGIC_LESS_EQUAL;
+// ">" return LOGIC_GREATER;
+// ">=" return LOGIC_GREATER_EQUAL;
+%}
+
+
+"&&"		return LOGIC_AND;
+"||"		return LOGIC_OR;
+"=="		return LOGIC_EQ;
+"!="		return LOGIC_NEQ;
+">"		return LOGIC_GT;
+">="		return LOGIC_GEQ;
+"<="		return LOGIC_LEQ;
+"<"		return LOGIC_LT;
+
+
+%{
+// arithematic operators
+%}
+"+"  { return PLUS;} 
+"-" { return MINUS;}
+"*" {return MULT;}
+"/" {return DIV;}
+
+
+%{
 // const values
 %}
 
@@ -59,11 +89,8 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 			yylval = atoi(yytext);
 			return CONST_INT;
 		}
-"+"  { return PLUS;} 
-"-" { return MINUS;}
-"*" {return MULT;}
-"/" {return DIV;}
-[-+()=\n{}] return *yytext;
+
+[()=\n{}] return *yytext;
 [ \t]  ; /* skip whitespace */
 ";" {return ENDL;}
 .   {

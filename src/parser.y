@@ -5,12 +5,19 @@
 	int sym[26];
 	#define debug 1
 	int i;
-%}
+%} 
+
+%token  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
+
+%left  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
+
+
 %token EQUAL PLUS MINUS MULT DIV  VAR ENDL
 %left PLUS MINUS
 %left MULT DIV
 %right POW
 %token IF ELIF ELSE  FOR  WHILE REPEAT UNTIL  SWITCH CASE BREAK DEFAULT      // Keywords
+
 // types 
 %token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL
 
@@ -31,7 +38,7 @@ statement:
 	| typing VAR   ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
 	| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
-	| '{' program '}' {if(debug){printf("%d {  } \n", i++);} }
+	| '{' program '}' { if(debug){printf("%d {  } \n", i++);} }
 	;
 // expr is anything that can appear on the right hand side of expression
 expr:
@@ -41,8 +48,15 @@ expr:
 	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}}
 	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}}
 	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}}
+	| expr LOGIC_EQ expr {}
+	| expr LOGIC_NEQ expr {}
+	| expr LOGIC_OR expr {}
+	| expr LOGIC_AND expr {}
+	| expr LOGIC_LEQ expr {}
+	| expr LOGIC_GEQ expr {}
 	| '(' expr ')' {if(debug){printf("%d (expr) \n", i++);}  }
 	;
+
 const_val:
 	CONST_FALSE
 	| CONST_TRUE
