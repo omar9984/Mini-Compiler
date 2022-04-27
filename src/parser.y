@@ -4,44 +4,45 @@
 	void yyerror(char*);
 	int sym[26];
 %}
-// data types
-%token INT CHAR
-// operators 
-%token  PLUS MINUS MULT DIV  VAR EQUAL
-//  operator's associativity 
-%left PLUS Minus
+
+%token EQUAL PLUS MINUS MULT DIV  VAR
+%left PLUS MINUS
 %left MULT DIV
 %right POW
-
-// the control  structures
-
 %token IF ELIF ELSE  FOR  WHILE REPEAT UNTIL  SWITCH CASE BREAK DEFAULT      // Keywords
+// types 
+%token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL
 
+// const values
+%token CONST_INT CONST_FALSE CONST_TRUE
 %%
 program:
-	program statement '\n'
-	|
+	program statement '\n' {printf("matched okay\n");}
+	| 
 	;
 statement: 
-	expr	{ printf("%d\n", $1); }
-	| VAR '=' expr {sym[$1]=$3;}
+	expr	{  }
+	| VAR '=' expr {}
 	;
 expr:
-	INT	{ $$  = $1; }
-	| VAR { $$ = sym[$1]; }
-	| expr PLUS expr { $$ = $1 + $3;}
-	| expr Minus expr { $$ = $1 - $3;}
-	| expr MULT expr { $$ = $1 * $3;}
-	| expr DIV expr { $$ = $1 / $3;}
-	| expr POW expr {
-			int x = $1;
-			for (int i = 1; i < $3; i++){
-				x *= $1;
-			}
-			$$ = x;
-	}
-	| '(' expr ')' { $$ = $2; }
-	
+	CONST_INT	{ }
+	| typing VAR { printf("this is declaration"); }
+	| VAR EQUAL const_val {}
+	| expr PLUS expr {  }
+	| expr MINUS expr {}
+	| expr MULT expr { }
+	| expr DIV expr {}
+	| '(' expr ')' {  }
+	;
+const_val:
+	CONST_FALSE
+	| CONST_TRUE
+	| CONST_INT;
+typing:
+	TYPE_INT {}
+	| TYPE_BOOL { }
+	| TYPE_CHAR { }
+	;
 %%
 
 
@@ -50,6 +51,6 @@ void yyerror(char*s){
 }
 int main(void){
 	yyparse();
-	printf("hello we are good");
+	printf("end of parser\n");
 	return 0;
 }

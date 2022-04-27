@@ -54,31 +54,25 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    EQUAL = 258,                   /* EQUAL  */
+    INT = 258,                     /* INT  */
     PLUS = 259,                    /* PLUS  */
     MINUS = 260,                   /* MINUS  */
     MULT = 261,                    /* MULT  */
     DIV = 262,                     /* DIV  */
-    VAR = 263,                     /* VAR  */
-    POW = 264,                     /* POW  */
-    IF = 265,                      /* IF  */
-    ELIF = 266,                    /* ELIF  */
-    ELSE = 267,                    /* ELSE  */
-    FOR = 268,                     /* FOR  */
-    WHILE = 269,                   /* WHILE  */
-    REPEAT = 270,                  /* REPEAT  */
-    UNTIL = 271,                   /* UNTIL  */
-    SWITCH = 272,                  /* SWITCH  */
-    CASE = 273,                    /* CASE  */
-    BREAK = 274,                   /* BREAK  */
-    DEFAULT = 275,                 /* DEFAULT  */
-    TYPE_INT = 276,                /* TYPE_INT  */
-    TYPE_CHAR = 277,               /* TYPE_CHAR  */
-    TYPE_CONST = 278,              /* TYPE_CONST  */
-    TYPE_BOOL = 279,               /* TYPE_BOOL  */
-    CONST_INT = 280,               /* CONST_INT  */
-    CONST_FALSE = 281,             /* CONST_FALSE  */
-    CONST_TRUE = 282               /* CONST_TRUE  */
+    POW = 263,                     /* POW  */
+    VAR = 264,                     /* VAR  */
+    Minus = 265,                   /* Minus  */
+    IF = 266,                      /* IF  */
+    ELIF = 267,                    /* ELIF  */
+    ELSE = 268,                    /* ELSE  */
+    FOR = 269,                     /* FOR  */
+    WHILE = 270,                   /* WHILE  */
+    REPEAT = 271,                  /* REPEAT  */
+    UNTIL = 272,                   /* UNTIL  */
+    SWITCH = 273,                  /* SWITCH  */
+    CASE = 274,                    /* CASE  */
+    BREAK = 275,                   /* BREAK  */
+    DEFAULT = 276                  /* DEFAULT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

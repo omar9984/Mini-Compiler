@@ -11,14 +11,14 @@
 #endif
 %}
 DIGIT [0-9]
-LETTER [a-zA-Z_$]
-VAR {LETTER}({LETTER} | {DIGIT})* 
-CHAR (\'.\')
-
+LETTER [a-zA-Z_]
+VARNAME {LETTER}({LETTER}|{DIGIT})*
 %%
 
-
-"if"      return IF;
+%{
+// control structures
+%}
+"if"      TOKEN( IF);
 "elif"      return ELIF;
 "else"    return ELSE;
 "while"	  return WHILE;
@@ -30,25 +30,41 @@ CHAR (\'.\')
 "repeat"  return REPEAT;
 "until"   return UNTIL;
 
+%{
+// types
+%}
+"int"    return TYPE_INT;
+"bool" return TYPE_BOOL;
+"char"   return TYPE_CHAR;
+"const"  return TYPE_CONST;
+
+%{
+// const values
+%}
+
+"false" return CONST_FALSE;
+"true" return CONST_TRUE;
 
 
+%{
+// variables
+%}
 
-
-DIGIT+ 	{
-		//	yylval = atoi(yytext);
-			return INT;
-		}
-"+" TOKEN(PLUS)
-"-" TOKEN(MINUS)
-"*" TOKEN(MULT)
-"/" TOKEN(DIV)
-"=" TOKEN(EQUAL)
-[-+()\n] return *yytext;
-[ \t]  ; /* skip whitespace */
-VAR {
+ {VARNAME}   {
 	// yylval = *yytext - 'a';
 	return VAR;
 }
+[0-9]+ 	{
+		// printf("expression [0-9]+\n");
+			yylval = atoi(yytext);
+			return CONST_INT;
+		}
+"+"  { return PLUS;} 
+"-" { return MINUS;}
+"*" {return MULT;}
+"/" {return DIV;}
+[-+()=\n] return *yytext;
+[ \t]  ; /* skip whitespace */
 
 %%
 int yywrap(void){

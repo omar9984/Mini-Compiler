@@ -5,5 +5,5 @@ build: parser.y scanner.l
 test: test.exe
 	echo "1+2" |.\test.exe
 	echo "2+2*3+2" |.\test.exe
-	echo "2+(2^3)+2" |.\test.exe
-	echo "2+2^(3+2)" |.\test.exe
+	echo "2+(2)+2" |.\test.exe
+	echo "2+23/2" |.\test.exe

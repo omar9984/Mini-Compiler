@@ -9,9 +9,12 @@
 %left PLUS Minus
 %left MULT DIV
 %right POW
+%token IF ELIF ELSE  FOR  WHILE REPEAT UNTIL  SWITCH CASE BREAK DEFAULT      // Keywords
+
 %%
 program:
 	program statement '\n'
+	| IF '\n' {printf("if matched");}
 	|
 	;
 statement: 
