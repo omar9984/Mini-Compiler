@@ -57,7 +57,7 @@ for_inital:
 	|
 	;
 for_condition:
-	expr
+	logic_expr
 	|
 	;
 for_inc:
@@ -99,11 +99,15 @@ expr:
 	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}}
 	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}}
 	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}}
-	| expr LOGIC_EQ expr {}
+	|logic_expr;
+logic_expr:
+	expr LOGIC_EQ expr {}
 	| expr LOGIC_NEQ expr {}
 	| expr LOGIC_OR expr {}
 	| expr LOGIC_AND expr {}
+	| expr LOGIC_LT expr {}
 	| expr LOGIC_LEQ expr {}
+	| expr LOGIC_GT expr {}
 	| expr LOGIC_GEQ expr {}
 	| '(' expr ')' {if(debug){printf("%d (expr) \n", i++);}  }
 	;
