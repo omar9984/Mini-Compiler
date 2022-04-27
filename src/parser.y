@@ -44,8 +44,28 @@ statement:
 	| IF  '('expr')' if_block ELIF   '('expr')' if_block  {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
 	| WHILE '('expr')' if_block  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 	| REPEAT if_block UNTIL  '('expr')'  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
+	| SWITCH '('expr')' '{' switch_block '}'   {if(debug){printf("%dswitch  expr  \n", i++);} }
 	| '{' block_statements '}' { if(debug){printf("%d {  } \n", i++);} }
 	;
+// CASE const_val: case_block switch_block { if(debug){printf("%d {  } \n", i++);} }
+
+switch_block:
+		case_block switch_block { if(debug){printf("%d {  } \n", i++);} }
+	   | DEFAULT ':' case_statement	 { if(debug){printf("%d {  } \n", i++);} }
+	   | DEFAULT ':' 	 { if(debug){printf("%d {  } \n", i++);} }
+	   |
+	   ;
+
+case_statement:
+	statement
+	| statement BREAK ENDL;
+	| BREAK ENDL
+	;
+case_block:
+	CASE const_val ':' case_statement {  if(debug){printf("%dcase_block statement break;\n", i++);} }
+	;
+
+
 if_block:
 	'{' block_statements '}' |
 	'{' '}';

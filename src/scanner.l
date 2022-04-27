@@ -83,7 +83,7 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 			return CONST_INT;
 		}
 
-[()=\n{}] return *yytext;
+[()=\n{}:] return *yytext;
 [ \t]  ; /* skip whitespace */
 ";" {return ENDL;}
 .   {
