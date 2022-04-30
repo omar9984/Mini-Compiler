@@ -6,6 +6,14 @@
 	#define debug 1
 	int i = 0;
 %} 
+
+/*   TODO Later
+%union {
+    int		IValue;
+	double DValue;
+    char* sValue;
+};
+*/
 %token EQUAL
 %token  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
 
@@ -22,6 +30,7 @@
 
 // const values
 %token INT_VALUE DOUBLE_VALUE FALSE_VALUE TRUE_VALUE
+
 %%
 program:
 	program block_code {printf("matched okay\n");}
