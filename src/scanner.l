@@ -35,7 +35,7 @@ DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
 // types
 %}
 "int"    	return TYPE_INT;
-"double"	return TYPE_DOUBLE
+"double"	return TYPE_DOUBLE;
 "bool" 		return TYPE_BOOL;
 "char"   	return TYPE_CHAR;
 "const"  	return TYPE_CONST;

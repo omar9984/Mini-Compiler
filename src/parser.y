@@ -45,7 +45,7 @@ statement:
 	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
 	| typing VAR   ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
 	| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
-	| Constant_type typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
+	| Constant_type  VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block ELSE if_block   {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
