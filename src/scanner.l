@@ -10,33 +10,35 @@
 #define TOKEN(t) return(t);
 #endif
 %}
-DIGIT [0-9]
-LETTER [a-zA-Z_$]
+DIGIT 	[0-9]
+LETTER 	[a-zA-Z_$]
 VARNAME {LETTER}({LETTER}|{DIGIT})*
+DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
 %%
 
 %{
 // control structures
 %}
-"if"      TOKEN( IF);
+"if"      	return IF;
 "elif"      return ELIF;
-"else"    return ELSE;
-"while"	  return WHILE;
-"for"     return FOR;
-"switch"  return SWITCH;
-"case"    return CASE;
-"default" return DEFAULT;
-"break"   return BREAK;
-"repeat"  return REPEAT;
-"until"   return UNTIL;
+"else" 		return ELSE;
+"while"	  	return WHILE;
+"for"     	return FOR;
+"switch"  	return SWITCH;
+"case"    	return CASE;
+"default" 	return DEFAULT;
+"break"   	return BREAK;
+"repeat"  	return REPEAT;
+"until"   	return UNTIL;
 
 %{
 // types
 %}
-"int"    return TYPE_INT;
-"bool" return TYPE_BOOL;
-"char"   return TYPE_CHAR;
-"const"  return TYPE_CONST;
+"int"    	return TYPE_INT;
+"double"	return TYPE_DOUBLE
+"bool" 		return TYPE_BOOL;
+"char"   	return TYPE_CHAR;
+"const"  	return TYPE_CONST;
 
 %{
 // logical operators
@@ -47,46 +49,45 @@ VARNAME {LETTER}({LETTER}|{DIGIT})*
 "||"		return LOGIC_OR;
 "=="		return LOGIC_EQ;
 "!="		return LOGIC_NEQ;
-">"		return LOGIC_GT;
+">"			return LOGIC_GT;
 ">="		return LOGIC_GEQ;
 "<="		return LOGIC_LEQ;
-"<"		return LOGIC_LT;
+"<"			return LOGIC_LT;
 
 
 %{
 // arithematic operators
 %}
-"+"  { return PLUS;} 
-"-" { return MINUS;}
-"*" {return MULT;}
-"/" {return DIV;}
-"=" {return EQUAL;}
+
+"-" 		return MINUS;
+"+"  		return PLUS; 
+"*" 		return MULT;
+"/" 		return DIV;
+"=" 		return EQUAL;
 
 
 %{
 // const values
 %}
 
-"false" return CONST_FALSE;
-"true" return CONST_TRUE;
+"false" 	return FALSE_VALUE;
+"true"  	return TRUE_VALUE;
 
 
 %{
 // variables
 %}
 
- {VARNAME}   {
-	return VAR;
-}
-[0-9]+ 	{
-		// printf("expression [0-9]+\n");
-			yylval = atoi(yytext);
-			return CONST_INT;
-		}
-
-[()\n{}:,] return *yytext;
-[ \t]  ; /* skip whitespace */
-";" {return ENDL;}
+{VARNAME}	return VAR;
+{DIGIT}+ 	{
+				//printf("expression [0-9]+\n");
+				yylval = atoi(yytext);
+				return INT_VALUE;
+			}
+{DOUBLE} 	return DOUBLE_VALUE;
+[()\n{}:,] 	return *yytext;
+[ \t]  		; /* skip whitespace */
+";" 		{return ENDL;}
 .   {
 		printf("unknown %c", *yytext);
 		perror("Unknown character ");

@@ -4,7 +4,7 @@
 	void yyerror(char*);
 	int sym[26];
 	#define debug 1
-	int i;
+	int i = 0;
 %} 
 %token EQUAL
 %token  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
@@ -12,17 +12,16 @@
 %left  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
 
 
-%token  PLUS MINUS MULT DIV  VAR ENDL
-%left PLUS MINUS
-%left MULT DIV
-%right POW
-%token IF ELIF ELSE  FOR  WHILE REPEAT UNTIL  SWITCH CASE BREAK DEFAULT      // Keywords
+%token  PLUS MINUS MULT DIV VAR ENDL
+%left PLUS MINUS MULT DIV
+%right EQUAL
+%token IF ELIF ELSE FOR WHILE REPEAT UNTIL SWITCH CASE BREAK DEFAULT      // Keywords
 
 // types 
-%token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL
+%token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL TYPE_DOUBLE
 
 // const values
-%token CONST_INT CONST_FALSE CONST_TRUE
+%token INT_VALUE DOUBLE_VALUE FALSE_VALUE TRUE_VALUE
 %%
 program:
 	program block_code {printf("matched okay\n");}
@@ -32,11 +31,12 @@ block_code:
 	statement;
 // this is the main building block of our program
 statement:
-	'\n' {}
-	| expr ENDL {}
+	'\n'
+	| expr ENDL
 	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
 	| typing VAR   ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
 	| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
+	| Constant_type typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block ELSE if_block   {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
@@ -77,20 +77,22 @@ case_statement:
 	| statement BREAK ENDL;
 	| BREAK ENDL
 	;
+
 case_block:
 	CASE const_val ':' case_statement {  if(debug){printf("%dcase_block statement break;\n", i++);} }
 	;
 
 // if block can also be used for FOR , WHILE , REPEAT UNTIL
 if_block:
-	'{' block_statements '}' |
-	'{' '}';
+	'{' block_statements '}'
+	|	'{' '}';
 
 
 block_statements:
 	statement {}
-	|block_statements statement {}
+	| block_statements statement {}
 	;
+
 // expr is anything that can appear on the right hand side of expression
 expr:
 	const_val	{if(debug){printf("%d const_val \n", i++);} }	
@@ -100,6 +102,7 @@ expr:
 	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}}
 	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}}
 	|logic_expr;
+
 logic_expr:
 	expr LOGIC_EQ expr {}
 	| expr LOGIC_NEQ expr {}
@@ -113,14 +116,22 @@ logic_expr:
 	;
 
 const_val:
-	CONST_FALSE
-	| CONST_TRUE
-	| CONST_INT;
+	FALSE_VALUE
+	| TRUE_VALUE
+	| DOUBLE_VALUE
+	| INT_VALUE;
+
 typing:
 	TYPE_INT {}
+	| TYPE_DOUBLE {}
 	| TYPE_BOOL { }
 	| TYPE_CHAR { }
 	;
+
+Constant_type:
+	TYPE_CONST{}
+	;
+
 %%
 
 
