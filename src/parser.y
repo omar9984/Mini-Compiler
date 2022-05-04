@@ -7,13 +7,17 @@
 	int i = 0;
 %} 
 
-/*   TODO Later
-%union {
+%{
+/*
+TODO Later
+union {
     int		IValue;
 	double DValue;
     char* sValue;
-};
 */
+%}
+
+
 %token EQUAL
 %token  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
 
@@ -43,9 +47,10 @@ statement:
 	'\n'
 	| expr ENDL
 	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
-	| typing VAR   ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
-	| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
-	| Constant_type  VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
+	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
+	| Constant_type typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
+	//| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
+	//| Constant_type typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block ELSE if_block   {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
@@ -110,7 +115,7 @@ expr:
 	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}}
 	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}}
 	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}}
-	|logic_expr;
+	| logic_expr;
 
 logic_expr:
 	expr LOGIC_EQ expr {}
@@ -128,13 +133,14 @@ const_val:
 	FALSE_VALUE
 	| TRUE_VALUE
 	| DOUBLE_VALUE
-	| INT_VALUE;
+	| INT_VALUE
+	;
 
 typing:
-	TYPE_INT {}
-	| TYPE_DOUBLE {}
-	| TYPE_BOOL { }
-	| TYPE_CHAR { }
+	TYPE_INT {printf("Type INT recieved\n");}
+	| TYPE_DOUBLE {printf("Type DOuble recieved\n");}
+	| TYPE_BOOL {printf("Type BOOL recieved\n");}
+	| TYPE_CHAR {printf("Type CHAR recieved\n");}
 	;
 
 Constant_type:
