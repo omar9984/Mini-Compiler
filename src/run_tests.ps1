@@ -23,12 +23,17 @@ foreach($file in $files){
         Write-Host  ("  syntax error in " +$file.BaseName ) -ForegroundColor red
     }else{
         $wins++
-        echo "  success " 
+        Write-Host "  success "   -ForegroundColor Blue
 
     }
 }
+if($wins -eq $files.Count){
 
-Write-Host  ("success rate " + $wins +  "/"+ $files.Count)  -ForegroundColor DarkGreen -BackgroundColor DARKYELLOW
+    Write-Host  ("success rate " + $wins +  "/"+ $files.Count)  -ForegroundColor DarkGreen -BackgroundColor DARKYELLOW
+}else{
+    Write-Host  ("success rate " + $wins +  "/"+ $files.Count)  -ForegroundColor DarkGreen
+
+}
 
 echo "end of  tests"
 echo "=============================="
