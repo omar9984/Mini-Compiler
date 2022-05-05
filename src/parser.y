@@ -3,8 +3,11 @@
 	int yylex(void);
 	void yyerror(char*);
 	int sym[26];
-	#define debug 1
+	#define debug 0
 	int i = 0;
+	#include <stdlib.h>
+	extern FILE* yyin;
+
 %} 
 
 %{
@@ -53,7 +56,7 @@ statement:
 	//| Constant_type typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
-	| IF  '('expr')' if_block ELSE if_block   {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
+	| IF  '('expr')' if_block else_block  {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
 	| IF  '('expr')' if_block ELIF   '('expr')' if_block ELSE if_block   {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
 	| IF  '('expr')' if_block ELIF   '('expr')' if_block  {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
 	| WHILE '('expr')' if_block  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
@@ -96,9 +99,15 @@ case_block:
 	CASE const_val ':' case_statement {  if(debug){printf("%dcase_block statement break;\n", i++);} }
 	;
 
+// the "IF-ELIF-ELSE" part
+else_block:
+	'\n' else_block
+	| ELSE if_block ;
+
 // if block can also be used for FOR , WHILE , REPEAT UNTIL
 if_block:
-	'{' block_statements '}'
+	'\n' if_block
+	|'{' block_statements '}'
 	|	'{' '}';
 
 
@@ -137,10 +146,10 @@ const_val:
 	;
 
 typing:
-	TYPE_INT {printf("Type INT recieved\n");}
-	| TYPE_DOUBLE {printf("Type DOuble recieved\n");}
-	| TYPE_BOOL {printf("Type BOOL recieved\n");}
-	| TYPE_CHAR {printf("Type CHAR recieved\n");}
+	TYPE_INT {if(debug){printf("Type INT recieved\n");}}
+	| TYPE_DOUBLE {if(debug){printf("Type DOuble recieved\n");}}
+	| TYPE_BOOL {if(debug){printf("Type BOOL recieved\n");}}
+	| TYPE_CHAR {if(debug){printf("Type CHAR recieved\n");}}
 	;
 
 Constant_type:
@@ -153,8 +162,32 @@ Constant_type:
 void yyerror(char*s){
 	fprintf(stderr, "%s\n", s);
 }
-int main(void){
-	yyparse();
-	printf("end of parser\n");
+
+
+void parse(FILE* fileInput)
+    {
+        yyin= fileInput;
+        while(feof(yyin)==0)
+        {
+        yyparse();
+        }
+    }
+
+
+int main(int argc,char* argv[]){
+
+	 FILE* fileInput;
+    char inputBuffer[36];
+    char lineData[36];
+
+    if((fileInput=fopen(argv[1],"r"))==NULL)
+        {
+        printf("Error reading files, the program terminates immediately\n");
+        exit(0);
+        }
+    parse(fileInput);
+
+	// yyparse();
+	// printf("end of parser\n");
 	return 0;
 }
