@@ -101,18 +101,17 @@ case_block:
 
 // the "IF-ELIF-ELSE" part
 else_block:
-	'\n' else_block
-	| ELSE if_block ;
+
+	 ELSE if_block ;
 
 // if block can also be used for FOR , WHILE , REPEAT UNTIL
 if_block:
 	'\n' if_block
-	|'{' block_statements '}'
+	| '{' block_statements '}'
 	|	'{' '}';
 
 elif_block:
-	'\n' elif_block
-	|ELIF   '('expr')' if_block;
+ELIF   '('expr')' if_block;
 block_statements:
 	statement {}
 	| block_statements statement {}

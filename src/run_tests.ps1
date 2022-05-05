@@ -1,23 +1,35 @@
+$conf = (make build | sls confict)2>&1
+
+if($conf){
+    # echo $file.BaseName " error: " $err 
+    Write-Host  ("parser confilct run `make debug` for more info ") -ForegroundColor red
+
+}else{
+    $wins++
+    Write-Host   "build is ok no confilcts "   -ForegroundColor DarkGreen
+
+}
+
+
 echo "=============================="
 echo "running tests"
 $files = dir ./examples
+$wins=0
 foreach($file in $files){
     # echo ./examples/$file.FullName
     $err =( .\test.exe $file.FullName| sls err ) 2>&1
-
+    echo $file.BaseName
     if($err){
-        echo $file.BaseName " error: " $err 
-        echo "run this to debug it "
-        echo (".\test.exe "+$file.FullName+" | sls err ")
+        Write-Host  ("  syntax error in " +$file.BaseName ) -ForegroundColor red
     }else{
-        echo $file.BaseName " success " 
+        $wins++
+        echo "  success " 
 
     }
 }
-# .\test.exe .\examples\ex1.p | sls err 
-# .\test.exe .\examples\ex2.p | sls err 
-# .\test.exe .\examples\ex3.p | sls err 
-# .\test.exe .\examples\ex4.p | sls err 
+
+Write-Host  ("success rate " + $wins +  "/"+ $files.Count)  -ForegroundColor DarkGreen -BackgroundColor DARKYELLOW
+
 echo "end of  tests"
 echo "=============================="
 
