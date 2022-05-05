@@ -7,7 +7,6 @@ if($conf){
 }else{
     $wins++
     Write-Host   "build is ok no confilcts "   -ForegroundColor DarkGreen
-
 }
 
 

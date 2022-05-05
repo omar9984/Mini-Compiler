@@ -85,9 +85,10 @@ DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
 				return INT_VALUE;
 			}
 {DOUBLE} 	return DOUBLE_VALUE;
-[()\n{}:,] 	return *yytext;
+[(){}:,] 	return *yytext;
 [ \t]  		; /* skip whitespace */
 ";" 		{return ENDL;}
+'\n' {}
 .   {
 		printf("unknown %c", *yytext);
 		perror("Unknown character ");

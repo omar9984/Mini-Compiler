@@ -6,6 +6,10 @@ int i;
 i=1;
 int result;
 result =1;
-switch(i){  
-          case 1: break; default: break;   
-             }
+switch(i)
+{  
+          case 1:
+            a=32; 
+            break; 
+          default: break;   
+}

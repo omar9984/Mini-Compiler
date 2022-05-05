@@ -3,7 +3,7 @@
 	int yylex(void);
 	void yyerror(char*);
 	int sym[26];
-	#define debug 0
+	#define debug 1
 	int i = 0;
 	#include <stdlib.h>
 	extern FILE* yyin;
@@ -47,18 +47,17 @@ block_code:
 	statement;
 // this is the main building block of our program
 statement:
-	'\n'
-	| expr ENDL
+	 expr ENDL
 	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
 	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
 	| Constant_type typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
+	// | "let" typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 	//| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
-	//| Constant_type typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block else_block  {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
-	// | IF  '('expr')' if_block elif_block else_block   {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
-	// | IF  '('expr')' if_block elif_block  {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
+	| IF  '('expr')' if_block elif_block else_block   {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
+	| IF  '('expr')' if_block elif_block  {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
 	| WHILE '('expr')' if_block  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 	| REPEAT if_block UNTIL  '('expr')'  {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 	| FOR '(' for_inital ENDL for_condition  ENDL for_inc ')' if_block  { if(debug){printf("%d for loop  expr  \n", i++);} }
@@ -101,13 +100,11 @@ case_block:
 
 // the "IF-ELIF-ELSE" part
 else_block:
-	'\n' else_block
-	 |ELSE if_block ;
+ELSE if_block ;
 
 // if block can also be used for FOR , WHILE , REPEAT UNTIL
 if_block:
-	'\n' if_block
-	| '{' block_statements '}'
+'{' block_statements '}'
 	|	'{' '}';
 
 elif_block:
