@@ -3,7 +3,7 @@
 	int yylex(void);
 	void yyerror(char*);
 	int sym[26];
-	#define debug 1
+	#define debug 0
 	int i = 0;
 	#include <stdlib.h>
 	extern FILE* yyin;
@@ -48,11 +48,9 @@ block_code:
 // this is the main building block of our program
 statement:
 	 expr ENDL
-	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
 	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
-	| Constant_type typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
-	//| Constant_type typing VAR '=' expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
-	//| typing VAR '=' expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
+	| Constant_type typing VAR EQUAL expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
+	| typing VAR EQUAL expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block else_block  {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
