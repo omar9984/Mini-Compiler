@@ -51,8 +51,8 @@ statement:
 	| VAR '=' expr  ENDL { if(debug){printf("%d typing VAR=expr \n", i++);} }
 	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
 	| Constant_type typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
-	// | "let" typing VAR '=' const_val  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
-	//| typing VAR '=' const_val  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
+	//| Constant_type typing VAR '=' expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
+	//| typing VAR '=' expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block else_block  {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
@@ -145,7 +145,7 @@ const_val:
 
 typing:
 	TYPE_INT {if(debug){printf("Type INT recieved\n");}}
-	| TYPE_DOUBLE {if(debug){printf("Type DOuble recieved\n");}}
+	| TYPE_DOUBLE {if(debug){printf("Type Double recieved\n");}}
 	| TYPE_BOOL {if(debug){printf("Type BOOL recieved\n");}}
 	| TYPE_CHAR {if(debug){printf("Type CHAR recieved\n");}}
 	;
@@ -159,6 +159,7 @@ Constant_type:
 
 void yyerror(char*s){
 	fprintf(stderr, "%s\n", s);
+	//fprintf(stderr, "syntax error at line %d\n", i);
 }
 
 
@@ -174,7 +175,7 @@ void parse(FILE* fileInput)
 
 int main(int argc,char* argv[]){
 
-	 FILE* fileInput;
+	FILE* fileInput;
     char inputBuffer[36];
     char lineData[36];
 
@@ -185,7 +186,7 @@ int main(int argc,char* argv[]){
         }
     parse(fileInput);
 
-	// yyparse();
-	// printf("end of parser\n");
+	/* yyparse();
+	printf("end of parser\n"); */
 	return 0;
 }
