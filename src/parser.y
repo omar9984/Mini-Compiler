@@ -67,7 +67,8 @@ statement:
 // for part
 
 for_inital:
-	VAR EQUAL expr
+	typing VAR EQUAL expr
+	|VAR EQUAL expr
 	|
 	;
 for_condition:
