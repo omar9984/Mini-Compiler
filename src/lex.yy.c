@@ -1,5 +1,5 @@
 
-#line 2 "lex.yy.c"
+#line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -510,15 +510,15 @@ char *yytext;
 #line 2 "scanner.l"
 #include<stdlib.h>
 #include "parser.tab.h"
-#line 513 "lex.yy.c"
+#line 514 "lex.yy.c"
 #line 7 "scanner.l"
 #ifdef PRINT
 #define TOKEN(t) printf("Token " #t "\n");
 #else
 #define TOKEN(t) return(t);
 #endif
-#line 520 "lex.yy.c"
 #line 521 "lex.yy.c"
+#line 522 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -529,7 +529,7 @@ char *yytext;
  */
 #include <unistd.h>
 #endif
-    
+
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
 #endif
@@ -742,7 +742,7 @@ YY_DECL
 #line 21 "scanner.l"
 // control structures
 
-#line 745 "lex.yy.c"
+#line 746 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1022,7 +1022,7 @@ YY_RULE_SETUP
 #line 97 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1025 "lex.yy.c"
+#line 1026 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
