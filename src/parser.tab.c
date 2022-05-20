@@ -66,7 +66,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "parser.y"
+#line 1 "./rules/parser.y"
 
 	#include <stdio.h>
 	int yylex(void);
@@ -77,7 +77,7 @@
 	#include <stdlib.h>
 	extern FILE* yyin;
 
-#line 13 "parser.y"
+#line 13 "./rules/parser.y"
 
 /*
 TODO Later
@@ -1490,241 +1490,241 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 43 "parser.y"
+#line 43 "./rules/parser.y"
                            {printf("matched okay\n");}
 #line 1496 "parser.tab.c"
     break;
 
   case 6:
-#line 51 "parser.y"
+#line 51 "./rules/parser.y"
                           { if(debug){printf("%d typing VAR \n", i++);}  }
 #line 1502 "parser.tab.c"
     break;
 
   case 7:
-#line 52 "parser.y"
+#line 52 "./rules/parser.y"
                                                     {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
 #line 1508 "parser.tab.c"
     break;
 
   case 8:
-#line 53 "parser.y"
+#line 53 "./rules/parser.y"
                                       {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
 #line 1514 "parser.tab.c"
     break;
 
   case 9:
-#line 54 "parser.y"
+#line 54 "./rules/parser.y"
                               {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
 #line 1520 "parser.tab.c"
     break;
 
   case 10:
-#line 55 "parser.y"
+#line 55 "./rules/parser.y"
                                      {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 #line 1526 "parser.tab.c"
     break;
 
   case 11:
-#line 56 "parser.y"
+#line 56 "./rules/parser.y"
                                               {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
 #line 1532 "parser.tab.c"
     break;
 
   case 12:
-#line 57 "parser.y"
+#line 57 "./rules/parser.y"
                                                           {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
 #line 1538 "parser.tab.c"
     break;
 
   case 13:
-#line 58 "parser.y"
+#line 58 "./rules/parser.y"
                                               {if(debug){printf("%dIF ELIF  expr  \n", i++);} }
 #line 1544 "parser.tab.c"
     break;
 
   case 14:
-#line 59 "parser.y"
+#line 59 "./rules/parser.y"
                                      {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 #line 1550 "parser.tab.c"
     break;
 
   case 15:
-#line 60 "parser.y"
+#line 60 "./rules/parser.y"
                                              {if(debug){printf("%dIF WHILE  expr  \n", i++);} }
 #line 1556 "parser.tab.c"
     break;
 
   case 16:
-#line 61 "parser.y"
+#line 61 "./rules/parser.y"
                                                                             { if(debug){printf("%d for loop  expr  \n", i++);} }
 #line 1562 "parser.tab.c"
     break;
 
   case 17:
-#line 62 "parser.y"
+#line 62 "./rules/parser.y"
                                                    {if(debug){printf("%dswitch  expr  \n", i++);} }
 #line 1568 "parser.tab.c"
     break;
 
   case 18:
-#line 63 "parser.y"
+#line 63 "./rules/parser.y"
                                    { if(debug){printf("%d {  } \n", i++);} }
 #line 1574 "parser.tab.c"
     break;
 
   case 27:
-#line 84 "parser.y"
+#line 84 "./rules/parser.y"
                                         { if(debug){printf("%d {  } \n", i++);} }
 #line 1580 "parser.tab.c"
     break;
 
   case 28:
-#line 85 "parser.y"
+#line 85 "./rules/parser.y"
                                          { if(debug){printf("%d {  } \n", i++);} }
 #line 1586 "parser.tab.c"
     break;
 
   case 29:
-#line 86 "parser.y"
+#line 86 "./rules/parser.y"
                                  { if(debug){printf("%d {  } \n", i++);} }
 #line 1592 "parser.tab.c"
     break;
 
   case 34:
-#line 97 "parser.y"
+#line 97 "./rules/parser.y"
                                           {  if(debug){printf("%dcase_block statement break;\n", i++);} }
 #line 1598 "parser.tab.c"
     break;
 
   case 39:
-#line 112 "parser.y"
+#line 112 "./rules/parser.y"
                   {}
 #line 1604 "parser.tab.c"
     break;
 
   case 40:
-#line 113 "parser.y"
+#line 113 "./rules/parser.y"
                                      {}
 #line 1610 "parser.tab.c"
     break;
 
   case 41:
-#line 118 "parser.y"
+#line 118 "./rules/parser.y"
                         {if(debug){printf("%d const_val \n", i++);} }
 #line 1616 "parser.tab.c"
     break;
 
   case 42:
-#line 119 "parser.y"
+#line 119 "./rules/parser.y"
                 {if(debug){printf("%d VAR \n", i++);} }
 #line 1622 "parser.tab.c"
     break;
 
   case 43:
-#line 120 "parser.y"
+#line 120 "./rules/parser.y"
                          { if(debug){printf("%d expr + expr  \n", i++);} }
 #line 1628 "parser.tab.c"
     break;
 
   case 44:
-#line 121 "parser.y"
+#line 121 "./rules/parser.y"
                           {if(debug){printf("%d expr - expr \n", i++);}}
 #line 1634 "parser.tab.c"
     break;
 
   case 45:
-#line 122 "parser.y"
+#line 122 "./rules/parser.y"
                          { if(debug){printf("%d expr * expr \n", i++);}}
 #line 1640 "parser.tab.c"
     break;
 
   case 46:
-#line 123 "parser.y"
+#line 123 "./rules/parser.y"
                         {if(debug){printf("%d  expr / expr  \n", i++);}}
 #line 1646 "parser.tab.c"
     break;
 
   case 48:
-#line 127 "parser.y"
+#line 127 "./rules/parser.y"
                            {}
 #line 1652 "parser.tab.c"
     break;
 
   case 49:
-#line 128 "parser.y"
+#line 128 "./rules/parser.y"
                               {}
 #line 1658 "parser.tab.c"
     break;
 
   case 50:
-#line 129 "parser.y"
+#line 129 "./rules/parser.y"
                              {}
 #line 1664 "parser.tab.c"
     break;
 
   case 51:
-#line 130 "parser.y"
+#line 130 "./rules/parser.y"
                               {}
 #line 1670 "parser.tab.c"
     break;
 
   case 52:
-#line 131 "parser.y"
+#line 131 "./rules/parser.y"
                              {}
 #line 1676 "parser.tab.c"
     break;
 
   case 53:
-#line 132 "parser.y"
+#line 132 "./rules/parser.y"
                               {}
 #line 1682 "parser.tab.c"
     break;
 
   case 54:
-#line 133 "parser.y"
+#line 133 "./rules/parser.y"
                              {}
 #line 1688 "parser.tab.c"
     break;
 
   case 55:
-#line 134 "parser.y"
+#line 134 "./rules/parser.y"
                               {}
 #line 1694 "parser.tab.c"
     break;
 
   case 56:
-#line 135 "parser.y"
+#line 135 "./rules/parser.y"
                        {if(debug){printf("%d (expr) \n", i++);}  }
 #line 1700 "parser.tab.c"
     break;
 
   case 61:
-#line 146 "parser.y"
+#line 146 "./rules/parser.y"
                  {if(debug){printf("Type INT recieved\n");}}
 #line 1706 "parser.tab.c"
     break;
 
   case 62:
-#line 147 "parser.y"
+#line 147 "./rules/parser.y"
                       {if(debug){printf("Type Double recieved\n");}}
 #line 1712 "parser.tab.c"
     break;
 
   case 63:
-#line 148 "parser.y"
+#line 148 "./rules/parser.y"
                     {if(debug){printf("Type BOOL recieved\n");}}
 #line 1718 "parser.tab.c"
     break;
 
   case 64:
-#line 149 "parser.y"
+#line 149 "./rules/parser.y"
                     {if(debug){printf("Type CHAR recieved\n");}}
 #line 1724 "parser.tab.c"
     break;
 
   case 65:
-#line 153 "parser.y"
+#line 153 "./rules/parser.y"
                   {}
 #line 1730 "parser.tab.c"
     break;
@@ -1962,7 +1962,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 156 "parser.y"
+#line 156 "./rules/parser.y"
 
 
 
