@@ -1,13 +1,14 @@
-$conf = (make build | sls confict)2>&1
+(make build )2>build_out.txt
+$conf = cat build_out.txt | sls  conflict,"Error" -CaseSensitive
 echo $conf
-# if ( $conf ) {
-#     # echo $file.BaseName " error: " $err 
-#     Write-Host  ("parser confilct run `make debug` for more info ") -ForegroundColor red
-
-# } else {
-#     $wins++
-#     Write-Host   "build is ok no confilcts "   -ForegroundColor DarkGreen
-# }
+if ( $conf ) {
+    # echo $file.BaseName " error: " $err 
+    Write-Host  ("parser confilct or error run `make debug` for more info ") -ForegroundColor red
+    exit
+} else {
+    $wins++
+    Write-Host   "build is ok no confilcts "   -ForegroundColor DarkGreen
+}
 
 
 echo "=============================="
