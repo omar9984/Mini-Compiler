@@ -75,7 +75,7 @@
 	#define debug 0
 	int i = 0;
 	#include <stdlib.h>
-	extern FILE* yyin;
+	extern "C" FILE* yyin;
 
 #line 13 "./rules/parser.y"
 
@@ -1972,30 +1972,30 @@ void yyerror(char*s){
 }
 
 
-void parse(FILE* fileInput)
-    {
-        yyin= fileInput;
-        while(feof(yyin)==0)
-        {
-        yyparse();
-        }
-    }
+// void parse(FILE* fileInput)
+//     {
+//         yyin= fileInput;
+//         while(feof(yyin)==0)
+//         {
+//         yyparse();
+//         }
+//     }
 
 
-int main(int argc,char* argv[]){
+// int main(int argc,char* argv[]){
 
-	FILE* fileInput;
-    char inputBuffer[36];
-    char lineData[36];
+// 	FILE* fileInput;
+//     char inputBuffer[36];
+//     char lineData[36];
 
-    if((fileInput=fopen(argv[1],"r"))==NULL)
-        {
-        printf("Error reading files, the program terminates immediately\n");
-        exit(0);
-        }
-    parse(fileInput);
+//     if((fileInput=fopen(argv[1],"r"))==NULL)
+//         {
+//         printf("Error reading files, the program terminates immediately\n");
+//         exit(0);
+//         }
+//     parse(fileInput);
 
-	/* yyparse();
-	printf("end of parser\n"); */
-	return 0;
-}
+// 	/* yyparse();
+// 	printf("end of parser\n"); */
+// 	return 0;
+// }

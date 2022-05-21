@@ -3,7 +3,7 @@
 build: ./rules/parser.y ./rules/scanner.l
 	bison -d ./rules/parser.y 
 	flex ./rules/scanner.l
-	g++ -o test.exe lex.yy.c parser.tab.c
+	g++ -o test.exe lex.yy.c parser.tab.c main.cpp
 # gcc -std=gnu99  -o test.exe lex.yy.c parser.tab.c
 # some cases need to be copy pasted into powershell to work
 test: test.exe
