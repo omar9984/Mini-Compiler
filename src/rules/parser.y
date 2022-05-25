@@ -10,16 +10,11 @@
 
 %} 
 
-%{
-/*
-TODO Later
-union {
+/* %union {
     int		IValue;
-	double DValue;
-    char* sValue;
-*/
-%}
-
+	double 	DValue;
+    char* 	SValue;
+} */
 
 %token EQUAL
 %token  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
@@ -33,10 +28,16 @@ union {
 %token IF ELIF ELSE FOR WHILE REPEAT UNTIL SWITCH CASE BREAK DEFAULT      // Keywords
 
 // types 
-%token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL TYPE_DOUBLE
+%token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL TYPE_DOUBLE TYPE_STRING
 
 // const values
-%token INT_VALUE DOUBLE_VALUE FALSE_VALUE TRUE_VALUE
+%token INT_VALUE DOUBLE_VALUE FALSE_VALUE TRUE_VALUE CHAR_VALUE STRING_VALUE
+/* %token <IValue> INT_VALUE 
+%token <DValue> DOUBLE_VALUE
+%token <IValue> FALSE_VALUE
+%token <IValue> TRUE_VALUE
+%token <IValue> CHAR_VALUE
+%token <SValue> STRING_VALUE */
 
 %%
 program:
@@ -140,17 +141,20 @@ const_val:
 	| TRUE_VALUE
 	| DOUBLE_VALUE
 	| INT_VALUE
+	| CHAR_VALUE
+	| STRING_VALUE
 	;
 
 typing:
-	TYPE_INT {if(debug){printf("Type INT recieved\n");}}
-	| TYPE_DOUBLE {if(debug){printf("Type Double recieved\n");}}
-	| TYPE_BOOL {if(debug){printf("Type BOOL recieved\n");}}
-	| TYPE_CHAR {if(debug){printf("Type CHAR recieved\n");}}
+	TYPE_INT 		{if(debug){printf("Type INT recieved\n");}}
+	| TYPE_DOUBLE 	{if(debug){printf("Type Double recieved\n");}}
+	| TYPE_BOOL 	{if(debug){printf("Type BOOL recieved\n");}}
+	| TYPE_CHAR 	{if(debug){printf("Type CHAR recieved\n");}}
+	| TYPE_STRING 	{if(debug){printf("Type STRING recieved\n");}}
 	;
 
 Constant_type:
-	TYPE_CONST{}
+	TYPE_CONST		{if(debug){printf("Type CONST recieved\n");}}
 	;
 
 %%
@@ -172,20 +176,18 @@ void yyerror(char*s){
 //     }
 
 
-// int main(int argc,char* argv[]){
-
-// 	FILE* fileInput;
-//     char inputBuffer[36];
-//     char lineData[36];
-
-//     if((fileInput=fopen(argv[1],"r"))==NULL)
-//         {
-//         printf("Error reading files, the program terminates immediately\n");
-//         exit(0);
-//         }
-//     parse(fileInput);
-
-// 	/* yyparse();
-// 	printf("end of parser\n"); */
-// 	return 0;
-// }
+int main(int argc,char* argv[])
+{
+	/* FILE* fileInput;
+    char inputBuffer[36];
+    char lineData[36];
+    if((fileInput=fopen(argv[1],"r"))==NULL)
+        {
+        printf("Error reading files, the program terminates immediately\n");
+        exit(0);
+        }
+    parse(fileInput); */
+	yyparse();
+	printf("end of parser\n");
+	return 0;
+}

@@ -14,6 +14,9 @@ DIGIT 	[0-9]
 LETTER 	[a-zA-Z_$]
 VARNAME {LETTER}({LETTER}|{DIGIT})*
 DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
+ASCII	[ -~]
+CHAR	(\'{ASCII}\')|(\'\\[nftrbv]\')
+STRING	\"{ASCII}*\"
 %%
 
 %{
@@ -38,6 +41,7 @@ DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
 "double"	return TYPE_DOUBLE;
 "bool" 		return TYPE_BOOL;
 "char"   	return TYPE_CHAR;
+"string"   	return TYPE_STRING;
 "const"  	return TYPE_CONST;
 
 %{
@@ -85,6 +89,8 @@ DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
 				return INT_VALUE;
 			}
 {DOUBLE} 	return DOUBLE_VALUE;
+{CHAR} 		return CHAR_VALUE;
+{STRING} 	return STRING_VALUE;
 [(){}:,] 	return *yytext;
 [ \t]  		; /* skip whitespace */
 ";" 		{return ENDL;}
