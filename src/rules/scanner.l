@@ -9,6 +9,7 @@
 #else
 #define TOKEN(t) return(t);
 #endif
+int lineno= 0;
 %}
 DIGIT 	[0-9]
 LETTER 	[a-zA-Z_$]
@@ -94,7 +95,7 @@ STRING	\"{ASCII}*\"
 [(){}:,] 	return *yytext;
 [ \t]  		; /* skip whitespace */
 ";" 		{return ENDL;}
-'\n' {}
+'\n' 		{lineno++;}
 .   {
 		printf("unknown %c", *yytext);
 		perror("Unknown character ");

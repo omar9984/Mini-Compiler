@@ -5,6 +5,7 @@
 	int sym[26];
 	#define debug 0
 	int i = 0;
+	extern int lineno;
 	#include <stdlib.h>
 	extern "C" FILE* yyin;
 
@@ -161,8 +162,8 @@ Constant_type:
 
 
 void yyerror(char*s){
-	fprintf(stderr, "%s\n", s);
-	//fprintf(stderr, "syntax error at line %d\n", i);
+	//fprintf(stderr, "%s\n", s);
+	fprintf(stderr, "syntax error at line %d\n", lineno);
 }
 
 
