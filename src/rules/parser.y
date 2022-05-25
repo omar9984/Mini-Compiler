@@ -1,14 +1,43 @@
 %{
 	#include <stdio.h>
+	#include <string.h>
+	#include <stdlib.h>
 	int yylex(void);
 	void yyerror(char*);
+	void semantic_failure();
+	void semantic_failure_param(char *);
+	bool in_symbol_table(char*);
+	int get_type_from_sym_tab(char*);
+	char* get_value_from_sym_tab(char*);
+	bool is_intialized(char*);
+	bool is_constant(char*);
+	void insert_in_sym_tab(char*,char*,bool,bool,char*);
+	void set_intialized_state_for_var(char*,char*);
+	bool check_type_match(int,int);
+	int check_val_type(char*);
+	int convert_name_type(char*);
+	//void intialize_variable_expression();
+	void initialize_variable(char*,char*);
+	void print_symbol_table();
 	int sym[26];
 	#define debug 0
 	int i = 0;
 	extern int lineno;
-	#include <stdlib.h>
 	extern "C" FILE* yyin;
-
+	// enum data_type{
+	// 	int,		//0
+	// 	double,		//1
+	// 	bool,		//2		
+	// 	char,		//3
+	// 	string		//4
+	// 	};
+	const char* arr_type[5] = {"int","double","bool","char","string"};
+	struct symbol_table_element {
+		char name[50], value[50];
+		int type;
+		bool intialized;
+		bool constant;
+	};
 %} 
 
 /* %union {
@@ -50,10 +79,14 @@ block_code:
 // this is the main building block of our program
 statement:
 	 expr ENDL
-	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}  }
+	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}}
+	//| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);} insert_in_sym_tab($1,$2);  }
 	| Constant_type typing VAR EQUAL expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
+	//| Constant_type typing VAR EQUAL expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} insert_in_sym_tab($2,$3,true,true,$5); }
 	| typing VAR EQUAL expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
+	//| typing VAR EQUAL expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} insert_in_sym_tab($1,$2,false,true,$4); }
 	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
+	//| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} initialize_variable($1,$3); }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block else_block  {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
 	| IF  '('expr')' if_block elif_block else_block   {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
@@ -160,6 +193,219 @@ Constant_type:
 
 %%
 
+struct symbol_table_element symbol_table[200];
+int symbol_table_idx = 0;
+
+bool in_symbol_table(char* var_name) {//symbol_table_contains
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0) return true;
+	}
+
+	return false;
+}
+
+int get_type_from_sym_tab(char* var_name)
+{
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0) return symbol_table[i].type;
+	}
+}
+
+char* get_value_from_sym_tab(char* var_name)
+{
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0) return symbol_table[i].value;
+	}
+}
+
+
+bool is_intialized(char* var_name)
+{
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0) return symbol_table[i].intialized;
+	}
+	return false;
+}
+
+bool is_constant(char* var_name)
+{
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0) return symbol_table[i].constant;
+	}
+	return false;
+}
+
+void insert_in_sym_tab(char* var_type, char* var_name, bool is_const=false, bool is_initial=false, char* var_value="")
+{
+	if(in_symbol_table(var_name)) { 
+		char err[100];
+		sprintf(err,"Redeclaration of already declared variable %s", var_name);
+		semantic_failure_param(err); return; 
+	}
+	int dtype = convert_name_type(var_type);
+	if(dtype == -1){
+		char err[100];
+		sprintf(err,"Unknown type for variable %s", var_name);
+		semantic_failure_param(err); return; 
+	}
+
+	struct symbol_table_element new_element;
+	new_element.type = dtype;
+	strcpy(new_element.name, var_name);
+	
+	new_element.intialized = is_initial;
+	new_element.constant = is_const;
+	strcpy(new_element.value, var_value);
+	
+
+	symbol_table[symbol_table_idx++] = new_element;
+}
+
+void set_intialized_state_for_var(char* var_name, char * value)
+{
+
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0)
+		{
+			symbol_table[i].intialized = true;
+			strcpy(symbol_table[i].value, value);
+		}
+	}
+}
+
+bool check_type_match(int required_type, int var_type)
+{
+	return (required_type == var_type);
+}
+
+int check_val_type(char* val)
+{
+	// int or double
+	if(val[0] >= '0' && val[0] <= '9'){
+		if(strchr(val,'.') == NULL){ //int
+			return 0;
+		}
+		else{ //double
+			return 1;
+		}
+	}
+	//bool
+	if(!strcmp(val,"false") || !strcmp(val,"true") ){
+		return 2;
+	}
+	//char
+	if(val[0] == '\''){
+		return 3;
+	}
+	//string
+	if(val[0] == '"'){
+		return 4;
+	}
+	return 5;
+}
+
+int convert_name_type(char * var_type)
+{
+	if(!strcmp(var_type, "int")){
+		return 0;
+	}
+	if(!strcmp(var_type, "double")){
+		return 1;
+	}
+	if(!strcmp(var_type, "bool")){
+		return 2;
+	}
+	if(!strcmp(var_type, "char")){
+		return 3;
+	}
+	if(!strcmp(var_type, "string")){
+		return 4;
+	}
+	return -1;
+}
+
+void initialize_variable(char * var_name, char * value)
+{
+	if(!in_symbol_table(var_name)) { 
+		char err[100];
+		sprintf(err,"%s not declared", var_name);
+		semantic_failure_param(err); 
+		return; 
+	}
+
+	if(is_constant(var_name)){
+		char err[100];
+		sprintf(err,"Constant var can't be reinitialized %s", var_name);
+		semantic_failure_param(err); return; 
+	}
+	
+	int var_type_int = get_type_from_sym_tab(var_name);
+	//if( var_type == NULL) { semantic_failure(); return; }
+	//int var_type_int = convert_name_type(var_type);
+	int val_type = check_val_type(value);
+	if(val_type != 5){
+		if(var_type_int != val_type){ 
+			char err[100];
+			sprintf(err,"%s and %s are of different types", var_name, value);
+			semantic_failure_param(err); return;
+		}
+		set_intialized_state_for_var(var_name, value);
+	}
+	// assign var to var
+	else{
+		if(!in_symbol_table(value)) { 
+			char err[100];
+			sprintf(err,"%s not declared", value);
+			semantic_failure_param(err); 
+			return; 
+		}
+		if(!is_intialized(value)) { 
+			char err[100];
+			sprintf(err,"%s not intialized", value);
+			semantic_failure_param(err); return; 
+		}
+
+		int v_type_int = get_type_from_sym_tab(value);
+		//if( v_type == NULL) { semantic_failure(); return; }
+		//int v_type_int = convert_name_type(v_type);
+
+		if(v_type_int != var_type_int){ 
+			char err[100];
+			sprintf(err,"%s and %s are of different types", var_name, value);
+			semantic_failure_param(err); return; 
+		}
+		set_intialized_state_for_var(var_name, get_value_from_sym_tab(value));
+	}
+}
+
+
+void print_symbol_table() {
+	for(int i = 0; i < symbol_table_idx; i++) {
+		printf("[%d] type: %s\t name: %s\t value: %s\n", i+1, arr_type[symbol_table[i].type], symbol_table[i].name, symbol_table[i].value);
+	}
+}
+
+void semantic_failure()
+{
+	fprintf(stderr, "Semantic error at line %d\n", lineno);
+}
+
+void semantic_failure_param(char * err)
+{
+	fprintf(stderr, "Semantic error at line %d | %s\n", lineno, err);
+}
 
 void yyerror(char*s){
 	//fprintf(stderr, "%s\n", s);
