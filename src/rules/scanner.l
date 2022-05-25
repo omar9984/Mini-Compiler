@@ -1,5 +1,7 @@
 %{
-#include<stdlib.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "parser.tab.h"
 %}
 
@@ -10,6 +12,7 @@
 #define TOKEN(t) return(t);
 #endif
 int lineno= 0;
+void save_token();
 %}
 DIGIT 	[0-9]
 LETTER 	[a-zA-Z_$]
@@ -38,11 +41,11 @@ STRING	\"{ASCII}*\"
 %{
 // types
 %}
-"int"    	return TYPE_INT;
-"double"	return TYPE_DOUBLE;
-"bool" 		return TYPE_BOOL;
-"char"   	return TYPE_CHAR;
-"string"   	return TYPE_STRING;
+"int"    	{save_token(); return TYPE_INT;};
+"double"	{save_token(); return TYPE_DOUBLE;}
+"bool" 		{save_token(); return TYPE_BOOL;}
+"char"   	{save_token(); return TYPE_CHAR;}
+"string"   	{save_token(); return TYPE_STRING;}
 "const"  	return TYPE_CONST;
 
 %{
@@ -75,26 +78,30 @@ STRING	\"{ASCII}*\"
 // const values
 %}
 
-"false" 	return FALSE_VALUE;
-"true"  	return TRUE_VALUE;
+"false" 	{save_token(); return FALSE_VALUE;}
+"true"  	{save_token(); return TRUE_VALUE;}
 
 
 %{
 // variables
 %}
 
-{VARNAME}	return VAR;
+{VARNAME}	{
+				save_token();
+				return VAR;
+			}
 {DIGIT}+ 	{
 				//printf("expression [0-9]+\n");
-				yylval = atoi(yytext);
+				//yylval = atoi(yytext);
+				save_token();
 				return INT_VALUE;
 			}
-{DOUBLE} 	return DOUBLE_VALUE;
-{CHAR} 		return CHAR_VALUE;
-{STRING} 	return STRING_VALUE;
-[(){}:,] 	return *yytext;
+{DOUBLE} 	{save_token(); return DOUBLE_VALUE;}
+{CHAR} 		{save_token(); return CHAR_VALUE;}
+{STRING} 	{save_token(); return STRING_VALUE;}
+[(){}:,] 	{save_token(); return *yytext;}
 [ \t]  		; /* skip whitespace */
-";" 		{return ENDL;}
+";" 		{save_token(); return ENDL;}
 '\n' 		{lineno++;}
 .   {
 		printf("unknown %c", *yytext);
@@ -103,4 +110,9 @@ STRING	\"{ASCII}*\"
 %%
 int yywrap(void){
 	return 1;
+}
+
+void save_token()
+{
+	yylval.token = strdup(yytext);
 }

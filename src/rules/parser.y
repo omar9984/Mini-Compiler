@@ -45,23 +45,27 @@
 	double 	DValue;
     char* 	SValue;
 } */
+%union{
+	char* token;
+}
 
-%token EQUAL
-%token  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
+%type <token> typing Constant_type expr logic_expr
+%token <token> EQUAL
+%token <token> LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
 
 %left  LOGIC_OR LOGIC_AND LOGIC_EQ LOGIC_NEQ  LOGIC_LT LOGIC_LEQ LOGIC_GT LOGIC_GEQ
 
 
-%token  PLUS MINUS MULT DIV VAR ENDL
+%token <token> PLUS MINUS MULT DIV VAR ENDL
 %left PLUS MINUS MULT DIV
 %right EQUAL
-%token IF ELIF ELSE FOR WHILE REPEAT UNTIL SWITCH CASE BREAK DEFAULT      // Keywords
+%token <token> IF ELIF ELSE FOR WHILE REPEAT UNTIL SWITCH CASE BREAK DEFAULT      // Keywords
 
 // types 
-%token TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL TYPE_DOUBLE TYPE_STRING
+%token <token> TYPE_INT TYPE_CHAR TYPE_CONST TYPE_BOOL TYPE_DOUBLE TYPE_STRING
 
 // const values
-%token INT_VALUE DOUBLE_VALUE FALSE_VALUE TRUE_VALUE CHAR_VALUE STRING_VALUE
+%token <token> INT_VALUE DOUBLE_VALUE FALSE_VALUE TRUE_VALUE CHAR_VALUE STRING_VALUE
 /* %token <IValue> INT_VALUE 
 %token <DValue> DOUBLE_VALUE
 %token <IValue> FALSE_VALUE
@@ -79,14 +83,10 @@ block_code:
 // this is the main building block of our program
 statement:
 	 expr ENDL
-	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}}
-	//| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);} insert_in_sym_tab($1,$2);  }
-	| Constant_type typing VAR EQUAL expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} }
-	//| Constant_type typing VAR EQUAL expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} insert_in_sym_tab($2,$3,true,true,$5); }
-	| typing VAR EQUAL expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} }
-	//| typing VAR EQUAL expr  ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} insert_in_sym_tab($1,$2,false,true,$4); }
-	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} }
-	//| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} initialize_variable($1,$3); }
+	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);}insert_in_sym_tab($1,$2,false,false,"");print_symbol_table();  }
+	| Constant_type typing VAR EQUAL expr  ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);} insert_in_sym_tab($2,$3,true,true,$5); print_symbol_table();}
+	| typing VAR EQUAL expr ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);} insert_in_sym_tab($1,$2,false,true,$4); print_symbol_table();}
+	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);} initialize_variable($1,$3);print_symbol_table(); }
 	| IF  '('expr')' if_block    {if(debug){printf("%d if (expr) do expr  \n", i++);} }
 	| IF  '('expr')' if_block else_block  {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} }
 	| IF  '('expr')' if_block elif_block else_block   {if (debug){printf("%d IF ELIF ELSE expr  \n", i++);} }
@@ -245,7 +245,7 @@ bool is_constant(char* var_name)
 	return false;
 }
 
-void insert_in_sym_tab(char* var_type, char* var_name, bool is_const=false, bool is_initial=false, char* var_value="")
+void insert_in_sym_tab(char* var_type, char* var_name, bool is_const, bool is_initial, char* var_value)
 {
 	if(in_symbol_table(var_name)) { 
 		char err[100];
@@ -263,15 +263,46 @@ void insert_in_sym_tab(char* var_type, char* var_name, bool is_const=false, bool
 	new_element.type = dtype;
 	strcpy(new_element.name, var_name);
 	
-	new_element.intialized = is_initial;
 	new_element.constant = is_const;
-	strcpy(new_element.value, var_value);
 	
+	int val_type = check_val_type(var_value);
+	if(val_type != 5){
+		if(new_element.type != val_type){ 
+			char err[100];
+			sprintf(err,"%s and %s are of different types", var_name, var_value);
+			semantic_failure_param(err); return;
+		}
+		strcpy(new_element.value, var_value);
+	}
+	// assign var to var
+	else{
+		if(!in_symbol_table(var_value)) { 
+			char err[100];
+			sprintf(err,"%s not declared", var_value);
+			semantic_failure_param(err); 
+			return; 
+		}
+		if(!is_intialized(var_value)) { 
+			char err[100];
+			sprintf(err,"%s not intialized", var_value);
+			semantic_failure_param(err); return; 
+		}
 
+		int v_type_int = get_type_from_sym_tab(var_value);
+
+		if(v_type_int != new_element.type){ 
+			char err[100];
+			sprintf(err,"%s and %s are of different types", var_name, var_value);
+			semantic_failure_param(err); return; 
+		}
+		strcpy(new_element.value, get_value_from_sym_tab(var_value));
+	}
+
+	new_element.intialized = true;
 	symbol_table[symbol_table_idx++] = new_element;
 }
 
-void set_intialized_state_for_var(char* var_name, char * value)
+void set_intialized_state_for_var(char* var_name, char* value)
 {
 
 	for(int i = 0; i < symbol_table_idx; i++) {
