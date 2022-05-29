@@ -19,8 +19,12 @@
 	//void intialize_variable_expression();
 	void initialize_variable(char*,char*);
 	void print_symbol_table();
+	char* ALU(char,char*,char*);
+
+
+
 	int sym[26];
-	#define debug 0
+	#define debug 1
 	int i = 0;
 	extern int lineno;
 	extern "C" FILE* yyin;
@@ -37,6 +41,7 @@
 		int type;
 		bool intialized;
 		bool constant;
+		bool used;
 	};
 %} 
 
@@ -103,7 +108,7 @@ statement:
 
 for_inital:
 	typing VAR EQUAL expr
-	|VAR EQUAL expr
+	|VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);} initialize_variable($1,$3);print_symbol_table(); }
 	|
 	;
 for_condition:
@@ -152,10 +157,10 @@ block_statements:
 expr:
 	const_val	{if(debug){printf("%d const_val \n", i++);} }	
 	| VAR	{if(debug){printf("%d VAR \n", i++);} }	
-	| expr PLUS expr { if(debug){printf("%d expr + expr  \n", i++);} }
-	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}}
-	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}}
-	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}}
+	| expr PLUS expr { if(debug){printf("%d expr + expr  \n", i++);} $$ = ALU('+',$1,$3);}
+	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);} $$ = ALU('-',$1,$3);}
+	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);} $$ = ALU('*',$1,$3);}
+	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);} $$ = ALU('/',$1,$3);}
 	| logic_expr;
 
 logic_expr:
@@ -195,6 +200,8 @@ Constant_type:
 
 struct symbol_table_element symbol_table[200];
 int symbol_table_idx = 0;
+
+// Symbol table functions
 
 bool in_symbol_table(char* var_name) {//symbol_table_contains
 	for(int i = 0; i < symbol_table_idx; i++) {
@@ -247,23 +254,38 @@ bool is_constant(char* var_name)
 
 void insert_in_sym_tab(char* var_type, char* var_name, bool is_const, bool is_initial, char* var_value)
 {
+	// check if already found
 	if(in_symbol_table(var_name)) { 
 		char err[100];
 		sprintf(err,"Redeclaration of already declared variable %s", var_name);
 		semantic_failure_param(err); return; 
 	}
+	// check for type
 	int dtype = convert_name_type(var_type);
 	if(dtype == -1){
 		char err[100];
 		sprintf(err,"Unknown type for variable %s", var_name);
 		semantic_failure_param(err); return; 
 	}
-
+	// check if const and not initialized
+	if(is_const && !is_initial){
+		char err[100];
+		sprintf(err,"type Const variable must be initialized immediately %s", var_name);
+		semantic_failure_param(err); return; 
+	}
 	struct symbol_table_element new_element;
 	new_element.type = dtype;
+	new_element.intialized = is_initial;
+	new_element.constant = is_const;
+	new_element.used = false;
 	strcpy(new_element.name, var_name);
 	
-	new_element.constant = is_const;
+	if(!is_initial){
+		strcpy(new_element.value,"");
+		symbol_table[symbol_table_idx++] = new_element;
+		return;
+	}
+
 	
 	int val_type = check_val_type(var_value);
 	if(val_type != 5){
@@ -295,6 +317,7 @@ void insert_in_sym_tab(char* var_type, char* var_name, bool is_const, bool is_in
 			sprintf(err,"%s and %s are of different types", var_name, var_value);
 			semantic_failure_param(err); return; 
 		}
+		set_used_state_for_var(var_value);
 		strcpy(new_element.value, get_value_from_sym_tab(var_value));
 	}
 
@@ -312,6 +335,21 @@ void set_intialized_state_for_var(char* var_name, char* value)
 		{
 			symbol_table[i].intialized = true;
 			strcpy(symbol_table[i].value, value);
+			return;
+		}
+	}
+}
+
+void set_used_state_for_var(char* var_name)
+{
+
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table[i].name);
+
+		if(eq == 0)
+		{
+			symbol_table[i].used = true;
+			return;
 		}
 	}
 }
@@ -369,6 +407,7 @@ int convert_name_type(char * var_type)
 
 void initialize_variable(char * var_name, char * value)
 {
+	printf("%s\nGOGOGOGOGOGGOOGGGOGGGOGOGOGOG\n",value);
 	if(!in_symbol_table(var_name)) { 
 		char err[100];
 		sprintf(err,"%s not declared", var_name);
@@ -382,6 +421,10 @@ void initialize_variable(char * var_name, char * value)
 		semantic_failure_param(err); return; 
 	}
 	
+	if(is_intialized(var_name)){
+		set_used_state_for_var(var_name);
+	}
+
 	int var_type_int = get_type_from_sym_tab(var_name);
 	//if( var_type == NULL) { semantic_failure(); return; }
 	//int var_type_int = convert_name_type(var_type);
@@ -425,6 +468,50 @@ void initialize_variable(char * var_name, char * value)
 void print_symbol_table() {
 	for(int i = 0; i < symbol_table_idx; i++) {
 		printf("[%d] type: %s\t name: %s\t value: %s\n", i+1, arr_type[symbol_table[i].type], symbol_table[i].name, symbol_table[i].value);
+	}
+}
+
+
+char* ALU(char op,char* x,char* y){
+	int x_type = check_val_type(x),y_type = check_val_type(y);
+	if(x_type == 5){
+		strcpy(x,get_value_from_sym_tab(x));
+		printf("---------------- x = %s \n",x);
+		x_type = check_val_type(get_value_from_sym_tab(x));
+	}
+	if(y_type == 5){
+		printf("---------------- y = %s \n",y);
+		strcpy(y,get_value_from_sym_tab(y));
+		y_type = check_val_type(get_value_from_sym_tab(y));
+	}
+	
+	printf("the op is %c, first operand is %s, second is %s\n",op,x,y);
+	int res_i;
+	char* res;
+	printf("---------------- heeeeeeeeeeeeeeeey --------------------------\n");
+	switch(op)
+	{
+		case '+':
+			res_i = atoi(x) + atoi(y);
+			sprintf(res, "%d", res_i);
+			printf("---------------- res = %s \n",res);
+			return res;
+		
+		case '-':
+			res_i = atoi(x) - atoi(y);
+			sprintf(res, "%d", res_i);
+			return res;
+		case '*':
+			res_i = atoi(x) * atoi(y);
+			sprintf(res, "%d", res_i);
+			return res;
+		case '/':
+			// TODO: handle divide by zero
+			res_i = atoi(x) / atoi(y);
+			sprintf(res, "%d", res_i);
+			return res;
+		default:
+			return "-1";
 	}
 }
 

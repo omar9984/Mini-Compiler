@@ -53,25 +53,25 @@ STRING	\"{ASCII}*\"
 %}
 
 
-"&&"		return LOGIC_AND;
-"||"		return LOGIC_OR;
-"=="		return LOGIC_EQ;
-"!="		return LOGIC_NEQ;
-">"			return LOGIC_GT;
-">="		return LOGIC_GEQ;
-"<="		return LOGIC_LEQ;
-"<"			return LOGIC_LT;
+"&&"		{save_token();return LOGIC_AND;}
+"||"		{save_token();return LOGIC_OR;}
+"=="		{save_token();return LOGIC_EQ;}
+"!="		{save_token();return LOGIC_NEQ;}
+">"			{save_token();return LOGIC_GT;}
+">="		{save_token();return LOGIC_GEQ;}
+"<="		{save_token();return LOGIC_LEQ;}
+"<"			{save_token();return LOGIC_LT;}
 
 
 %{
 // arithematic operators
 %}
 
-"-" 		return MINUS;
-"+"  		return PLUS; 
-"*" 		return MULT;
-"/" 		return DIV;
-"=" 		return EQUAL;
+"-" 		{save_token();return MINUS;}
+"+"  		{save_token();return PLUS; }
+"*" 		{save_token();return MULT;}
+"/" 		{save_token();return DIV;}
+"=" 		{save_token();return EQUAL;}
 
 
 %{
