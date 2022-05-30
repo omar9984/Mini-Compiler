@@ -27,6 +27,7 @@ STRING	\"{ASCII}*\"
 // control structures
 %}
 "if"      	return IF;
+"then"		return THEN;
 "elif"      return ELIF;
 "else" 		return ELSE;
 "while"	  	return WHILE;
