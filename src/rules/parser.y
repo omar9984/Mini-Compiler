@@ -129,20 +129,10 @@ switch_block:
 	   | default_clause  	 { if(debug){printf("%d {  } \n", i++);} flag_case=0; flag_last_case = 1;add_label();flag_last_case = 0; }
 	   ;
 
-/*case_statement:
-	statement 
-	//| statement BREAK ENDL	////////////////////;
-	//| BREAK ENDL
-	;
- case_statement_extended:
-	statement case_statement_extended
-	|
-	; */
 case_statement:
 	statement case_statement_extended
-	//| statement BREAK ENDL	////////////////////;
-	//| BREAK ENDL
 	;
+
 case_statement_extended:
 	statement case_statement_extended
 	|
@@ -164,10 +154,6 @@ if_block:
 elif_block:
 		elif_clause  '('expr')' colon if_block elif_block_extended
 		;
-/* elif_block:
-		elif_clause  '('expr')' colon if_block elif_block
-		|
-		; */
 
 elif_block_extended:
 		elif_clause  '('expr')' colon if_block elif_block_extended
@@ -181,7 +167,7 @@ block_statements:
 
 // expr is anything that can appear on the right hand side of expression
 expr:
-	const_val	//{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false); }	
+	const_val
 	| VAR	{if(debug){printf("%d VAR \n", i++);}if(symbol_table_contains($1)){quadruple_insert("=",$1,"NULL","t#",false);set_var_used($1);}else{char err[100];sprintf(err,"varaible %s is not declared\n", $1);semantic_error_with_msg(err);}}	
 	| expr PLUS expr {if(debug){printf("%d expr + expr  \n", i++);} if(check_type_match($1,$3,0)  || check_type_match($1,$3,1)) {$$ = ALU('+',$1,$3);quadruple_insert("+",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('-',$1,$3);quadruple_insert("-",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
@@ -260,9 +246,7 @@ default_clause:
 %%
 
 struct symbol_table symbol_table_elements[500];
-/* struct symbol_table symbol_table_elements_scoped[200]; */
 int symbol_table_idx = 0;
-/* int symbol_table_scope_idx = 0; */
 
 struct Quadruple quadruples[200];
 struct Quadruple defer_quadruples[5];
@@ -270,7 +254,7 @@ int quadruple_idx = 0;
 
 // Symbol table functions
 
-bool symbol_table_contains(char* var_name) {//symbol_table_contains
+bool symbol_table_contains(char* var_name) {
 	for(int i = 0; i < symbol_table_idx; i++) {
 		if(!strcmp(var_name, symbol_table_elements[i].name))
 			return true;
@@ -664,7 +648,6 @@ void apply_defer(){
 void print_quadruples(){
 	printf("\n-------------------------printttttttttt Quadruples-------------------------\n");
 	for(int q = 0; q < quadruple_idx; q++){
-		//printf("\nline: %d\n", quadruples[q].line_num);
 		printf("arg1: %s\t", quadruples[q].src1);
 		printf("operation: %s\t", quadruples[q].op);
 		printf("arg2: %s\t", quadruples[q].src2);
@@ -693,8 +676,7 @@ void yyerror(char*s){
 	exit(1);
 }
 
-int main(int argc,char* argv[])
-{
+int main(int argc,char* argv[]){
 	int syntax_err_found;
 	yyin = fopen(argv[1], "r");
 	syntax_err_found = yyparse();
