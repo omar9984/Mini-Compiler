@@ -29,7 +29,8 @@
 	void apply_defer();
 
 
-	//int i = 0;
+	int i = 0;
+	// int scope = 1;
 	int label = 1;
 	int label_switch_case = 1;
 	int t = 1, t_reg = 0;
@@ -256,8 +257,10 @@ default_clause:
 
 %%
 
-struct symbol_table symbol_table_elements[200];
+struct symbol_table symbol_table_elements[500];
+/* struct symbol_table symbol_table_elements_scoped[200]; */
 int symbol_table_idx = 0;
+/* int symbol_table_scope_idx = 0; */
 
 struct Quadruple quadruples[200];
 struct Quadruple defer_quadruples[5];
@@ -267,9 +270,8 @@ int quadruple_idx = 0;
 
 bool symbol_table_contains(char* var_name) {//symbol_table_contains
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table_elements[i].name);
-
-		if(eq == 0) return true;
+		if(!strcmp(var_name, symbol_table_elements[i].name))
+			return true;
 	}
 
 	return false;
@@ -277,26 +279,23 @@ bool symbol_table_contains(char* var_name) {//symbol_table_contains
 
 int symbol_table_get_varType(char* var_name){
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table_elements[i].name);
-
-		if(eq == 0) return symbol_table_elements[i].type;
+		if(!strcmp(var_name, symbol_table_elements[i].name))
+			return symbol_table_elements[i].type;
 	}
 }
 
 bool is_var_initialized(char* var_name){
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table_elements[i].name);
-
-		if(eq == 0) return symbol_table_elements[i].initialized;
+		if(!strcmp(var_name, symbol_table_elements[i].name))
+			return symbol_table_elements[i].initialized;
 	}
 	return false;
 }
 
 bool is_var_constant(char* var_name){
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table_elements[i].name);
-
-		if(eq == 0) return symbol_table_elements[i].constant;
+		if(!strcmp(var_name, symbol_table_elements[i].name))
+			return symbol_table_elements[i].constant;
 	}
 	return false;
 }
@@ -378,9 +377,7 @@ void symbol_table_insert(char* var_type, char* var_name, bool is_const, bool is_
 void set_var_initialized(char* var_name){
 
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table_elements[i].name);
-
-		if(eq == 0)
+		if(!strcmp(var_name, symbol_table_elements[i].name))
 		{
 			symbol_table_elements[i].initialized = true;
 			return;
@@ -391,9 +388,7 @@ void set_var_initialized(char* var_name){
 void set_var_used(char* var_name){
 
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table_elements[i].name);
-
-		if(eq == 0)
+		if(!strcmp(var_name, symbol_table_elements[i].name))
 		{
 			symbol_table_elements[i].used = true;
 			return;
