@@ -5,32 +5,31 @@
 	#define debug 0
 	int yylex(void);
 	void yyerror(char*);
-	void semantic_failure();
-	void semantic_failure_param(char *);
-	bool in_symbol_table(char*);
-	int get_type_from_sym_tab(char*);
-	bool is_intialized(char*);
-	bool is_constant(char*);
-	void insert_in_sym_tab(char*,char*,bool,bool,char*);
-	void set_intialized_state_for_var(char*);
-	void set_used_state_for_var(char*);
+	void semantic_error();
+	void semantic_error_with_msg(char *);
+	bool symbol_table_contains(char*);
+	int symbol_table_get_varType(char*);
+	bool is_var_initialized(char*);
+	bool is_var_constant(char*);
+	void symbol_table_insert(char*,char*,bool,bool,char*);
+	void set_var_initialized(char*);
+	void set_var_used(char*);
 	bool check_type_match(char*,char*,int);
 	int check_val_type(char*);
 	int convert_name_type(char*);
 	char* reverse_type_value(int);
 	void initialize_variable(char*,char*);
 	void print_symbol_table();
-	void insert_quadruple(char* op, char* src1, char* src2, char* dst,bool defer);
+	void quadruple_insert(char* op, char* src1, char* src2, char* dst,bool defer);
 	void print_quadruples();
 	char* ALU(char,char*,char*);
-	void manageColon();
-	void addLabel();
+	void manage_colon();
+	void add_label();
 	void jump(bool,int);
 	void apply_defer();
 
 
-	int sym[26];
-	int i = 0;
+	//int i = 0;
 	int label = 1;
 	int label_switch_case = 1;
 	int t = 1, t_reg = 0;
@@ -38,13 +37,12 @@
 	int flag_case = 0;
 	int flag_last_case = 0;
 	extern int lineno;
-	// extern "C" FILE* yyin;
 	extern FILE *yyin;
 	const char* arr_type[5] = {"int","double","bool","char","string"};
-	struct symbol_table_element {
+	struct symbol_table {
 		char name[50];
 		int type;
-		bool intialized;
+		bool initialized;
 		bool constant;
 		bool used;
 		int line_num;
@@ -90,16 +88,16 @@ block_code:
 // this is the main building block of our program
 statement:
 	 expr ENDL
-	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);print_symbol_table();}insert_in_sym_tab($1,$2,false,false,"");  }
-	| Constant_type typing VAR EQUAL expr ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);print_symbol_table();} insert_quadruple("=","t#","NULL",$3,false); insert_in_sym_tab($2,$3,true,true,$5);}
-	| typing VAR EQUAL expr ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);print_symbol_table();} insert_quadruple("=","t#","NULL",$2,false); insert_in_sym_tab($1,$2,false,true,$4);}
-	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);print_symbol_table();}insert_quadruple("=","t#","NULL",$1,false); initialize_variable($1,$3);}
-	| if_clause '('expr')' colon if_block END  {if(debug){printf("%d if (expr) do expr  \n", i++);} addLabel(); }
-	| if_clause '('expr')' colon if_block else_clause if_block END {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} addLabel(); }
-	| if_clause '('expr')' colon if_block elif_block else_clause if_block END {if (debug){printf("%d if ELIF ELSE expr  \n", i++);}flag_last_case = 1;addLabel();flag_last_case = 0; }
-	| while_clause '('expr')' colon if_block  {if(debug){printf("%d WHILE  expr  \n", i++); }jump(false,-1); addLabel(); }
+	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);print_symbol_table();}symbol_table_insert($1,$2,false,false,"");  }
+	| Constant_type typing VAR EQUAL expr ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);print_symbol_table();} quadruple_insert("=","t#","NULL",$3,false); symbol_table_insert($2,$3,true,true,$5);}
+	| typing VAR EQUAL expr ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);print_symbol_table();} quadruple_insert("=","t#","NULL",$2,false); symbol_table_insert($1,$2,false,true,$4);}
+	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);print_symbol_table();}quadruple_insert("=","t#","NULL",$1,false); initialize_variable($1,$3);}
+	| if_clause '('expr')' colon if_block END  {if(debug){printf("%d if (expr) do expr  \n", i++);} add_label(); }
+	| if_clause '('expr')' colon if_block else_clause if_block END {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} add_label(); }
+	| if_clause '('expr')' colon if_block elif_block else_clause if_block END {if (debug){printf("%d if ELIF ELSE expr  \n", i++);}flag_last_case = 1;add_label();flag_last_case = 0; }
+	| while_clause '('expr')' colon if_block  {if(debug){printf("%d WHILE  expr  \n", i++); }jump(false,-1); add_label(); }
 	| repeat_clause if_block until_clause  '('expr')' colon {if(debug){printf("%d Repeat Until  \n", i++);}}
-	| for_clause '(' for_inital ENDL for_condition colon for_inc ')' if_block  { if(debug){printf("%d for loop  expr  \n", i++);} apply_defer();jump(false,-1);addLabel();}
+	| for_clause '(' for_inital ENDL for_condition colon for_inc ')' if_block  { if(debug){printf("%d for loop  expr  \n", i++);} apply_defer();jump(false,-1);add_label();}
 	| switch_clause '('expr')' '{' switch_block '}'   {if(debug){printf("%dswitch  expr  \n", i++);}}
 	| '{' block_statements '}' { if(debug){printf("%d {  } \n", i++);} }
 	| '{''}'
@@ -108,8 +106,8 @@ statement:
 // for part
 
 for_inital:
-	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}insert_quadruple("=","t#","NULL",$1,false); initialize_variable($1,$3);}
-	//typing VAR EQUAL expr {if(debug){printf("%d For Initial: typing VAR EQUAL expr  \n", i++);}insert_quadruple("=","t#","NULL",$2,false); insert_in_sym_tab($1,$2,false,true,$4);print_symbol_table(); }
+	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}quadruple_insert("=","t#","NULL",$1,false); initialize_variable($1,$3);}
+	//typing VAR EQUAL expr {if(debug){printf("%d For Initial: typing VAR EQUAL expr  \n", i++);}quadruple_insert("=","t#","NULL",$2,false); symbol_table_insert($1,$2,false,true,$4);print_symbol_table(); }
 	|
 	;
 for_condition:
@@ -117,15 +115,15 @@ for_condition:
 	|
 	;
 for_inc:
-	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}insert_quadruple("=","t#","NULL",$1,true); initialize_variable($1,$3);}
+	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}quadruple_insert("=","t#","NULL",$1,true); initialize_variable($1,$3);}
 	|
 	;
 
 // switch case part
 switch_block:
 		case_block switch_block { if(debug){printf("%d {  } \n", i++);} }
-	   | default_clause case_statement	 { if(debug){printf("%d {  } \n", i++);} flag_case=0; flag_last_case = 1;addLabel();flag_last_case = 0; }
-	   | default_clause  	 { if(debug){printf("%d {  } \n", i++);} flag_case=0; flag_last_case = 1;addLabel();flag_last_case = 0; }
+	   | default_clause case_statement	 { if(debug){printf("%d {  } \n", i++);} flag_case=0; flag_last_case = 1;add_label();flag_last_case = 0; }
+	   | default_clause  	 { if(debug){printf("%d {  } \n", i++);} flag_case=0; flag_last_case = 1;add_label();flag_last_case = 0; }
 	   ;
 
 /*case_statement:
@@ -180,33 +178,33 @@ block_statements:
 
 // expr is anything that can appear on the right hand side of expression
 expr:
-	const_val	//{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false); }	
-	| VAR	{if(debug){printf("%d VAR \n", i++);}insert_quadruple("=",$1,"NULL","t#",false); }	
-	| expr PLUS expr {if(debug){printf("%d expr + expr  \n", i++);} if(check_type_match($1,$3,0)  || check_type_match($1,$3,1)) {$$ = ALU('+',$1,$3);insert_quadruple("+",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('-',$1,$3);insert_quadruple("-",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('*',$1,$3);insert_quadruple("*",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('/',$1,$3);insert_quadruple("/",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_failure_param(err);}}
+	const_val	//{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false); }	
+	| VAR	{if(debug){printf("%d VAR \n", i++);}quadruple_insert("=",$1,"NULL","t#",false); }	
+	| expr PLUS expr {if(debug){printf("%d expr + expr  \n", i++);} if(check_type_match($1,$3,0)  || check_type_match($1,$3,1)) {$$ = ALU('+',$1,$3);quadruple_insert("+",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('-',$1,$3);quadruple_insert("-",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('*',$1,$3);quadruple_insert("*",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr DIV expr {if(debug){printf("%d  expr / expr  \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('/',$1,$3);quadruple_insert("/",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| logic_expr;
 
 logic_expr:
-	expr LOGIC_EQ expr 		{if(check_type_match($1,$3,-1)){$$="true";insert_quadruple("==",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_NEQ expr 	{if(check_type_match($1,$3,-1)){$$="true";insert_quadruple("!=",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_OR expr 	{if(check_type_match($1,$3,2)){$$="true";insert_quadruple("||",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands must be boolean types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_AND expr	{if(check_type_match($1,$3,2)){$$="true";insert_quadruple("&&",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands must be boolean types %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_LT expr 	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";insert_quadruple("<",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_LEQ expr	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";insert_quadruple("<=",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_GT expr 	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";insert_quadruple(">",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_failure_param(err);}}
-	| expr LOGIC_GEQ expr	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";insert_quadruple(">=",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_failure_param(err);}}
+	expr LOGIC_EQ expr 		{if(check_type_match($1,$3,-1)){$$="true";quadruple_insert("==",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_NEQ expr 	{if(check_type_match($1,$3,-1)){$$="true";quadruple_insert("!=",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_OR expr 	{if(check_type_match($1,$3,2)){$$="true";quadruple_insert("||",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands must be boolean types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_AND expr	{if(check_type_match($1,$3,2)){$$="true";quadruple_insert("&&",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands must be boolean types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_LT expr 	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";quadruple_insert("<",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_LEQ expr	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";quadruple_insert("<=",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_GT expr 	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";quadruple_insert(">",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
+	| expr LOGIC_GEQ expr	{if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){$$="true";quadruple_insert(">=",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands must be both int or double %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| '(' expr ')' {if(debug){printf("%d (expr) \n", i++);}  }
 	;
 
 const_val:
-	FALSE_VALUE   	{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false);}
-	| TRUE_VALUE	{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false);}
-	| DOUBLE_VALUE	{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false);}
-	| INT_VALUE		{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false);}
-	| CHAR_VALUE	{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false);}
-	| STRING_VALUE	{if(debug){printf("%d const_val \n", i++);}insert_quadruple("=",$1,"NULL","t#",false);}
+	FALSE_VALUE   	{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);}
+	| TRUE_VALUE	{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);}
+	| DOUBLE_VALUE	{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);}
+	| INT_VALUE		{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);}
+	| CHAR_VALUE	{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);}
+	| STRING_VALUE	{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);}
 	;
 
 typing:
@@ -222,43 +220,43 @@ Constant_type:
 	;
 
 colon:
-	COLON			{if(debug){printf("Type COLON recieved\n");} manageColon();}
+	COLON			{if(debug){printf("Type COLON recieved\n");} manage_colon();}
 	;
 if_clause:
 	IF			{if(debug){printf("Type IF recieved\n");}}
 	;
 elif_clause:
-	ELIF			{if(debug){printf("Type ELIF recieved\n");} jump(true,+1); addLabel();}
+	ELIF			{if(debug){printf("Type ELIF recieved\n");} jump(true,+1); add_label();}
 	;
 else_clause:
-	ELSE			{if(debug){printf("Type ELSE recieved\n");} jump(true,+1); addLabel();}
+	ELSE			{if(debug){printf("Type ELSE recieved\n");} jump(true,+1); add_label();}
 	;
 while_clause:
-	WHILE			{if(debug){printf("Type WHILE recieved\n");} addLabel();}
+	WHILE			{if(debug){printf("Type WHILE recieved\n");} add_label();}
 	;
 repeat_clause:
-	REPEAT			{if(debug){printf("Type REPEAT recieved\n");}addLabel();}
+	REPEAT			{if(debug){printf("Type REPEAT recieved\n");}add_label();}
 	;
 until_clause:
 	UNTIL			{if(debug){printf("Type UNTIL recieved\n");} flag_until=1;}
 	;
 for_clause:
-	FOR			{if(debug){printf("Type FOR recieved\n");}addLabel();}
+	FOR			{if(debug){printf("Type FOR recieved\n");}add_label();}
 	;
 switch_clause:
 	SWITCH			{if(debug){printf("Type SWITCH recieved\n");}}
 	;
 case_clause:
-	CASE			{if(debug){printf("Type Case recieved\n");} if(!flag_case){t_reg=t-1;flag_case=1;}else{jump(true,+1); addLabel();}printf("****flag_case = %d*****\n",flag_case);}
+	CASE			{if(debug){printf("Type Case recieved\n");} if(!flag_case){t_reg=t-1;flag_case=1;}else{jump(true,+1); add_label();}printf("****flag_case = %d*****\n",flag_case);}
 	;
 default_clause:
-	DEFAULT			{if(debug){printf("Type Default recieved\n");} jump(true,+1); addLabel();}
+	DEFAULT			{if(debug){printf("Type Default recieved\n");} jump(true,+1); add_label();}
 	;
 
 
 %%
 
-struct symbol_table_element symbol_table[200];
+struct symbol_table symbol_table_elements[200];
 int symbol_table_idx = 0;
 
 struct Quadruple quadruples[200];
@@ -267,9 +265,9 @@ int quadruple_idx = 0;
 
 // Symbol table functions
 
-bool in_symbol_table(char* var_name) {//symbol_table_contains
+bool symbol_table_contains(char* var_name) {//symbol_table_contains
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table[i].name);
+		int eq = strcmp(var_name, symbol_table_elements[i].name);
 
 		if(eq == 0) return true;
 	}
@@ -277,56 +275,56 @@ bool in_symbol_table(char* var_name) {//symbol_table_contains
 	return false;
 }
 
-int get_type_from_sym_tab(char* var_name){
+int symbol_table_get_varType(char* var_name){
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table[i].name);
+		int eq = strcmp(var_name, symbol_table_elements[i].name);
 
-		if(eq == 0) return symbol_table[i].type;
+		if(eq == 0) return symbol_table_elements[i].type;
 	}
 }
 
-bool is_intialized(char* var_name){
+bool is_var_initialized(char* var_name){
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table[i].name);
+		int eq = strcmp(var_name, symbol_table_elements[i].name);
 
-		if(eq == 0) return symbol_table[i].intialized;
-	}
-	return false;
-}
-
-bool is_constant(char* var_name){
-	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table[i].name);
-
-		if(eq == 0) return symbol_table[i].constant;
+		if(eq == 0) return symbol_table_elements[i].initialized;
 	}
 	return false;
 }
 
-void insert_in_sym_tab(char* var_type, char* var_name, bool is_const, bool is_initial, char* var_value){
+bool is_var_constant(char* var_name){
+	for(int i = 0; i < symbol_table_idx; i++) {
+		int eq = strcmp(var_name, symbol_table_elements[i].name);
+
+		if(eq == 0) return symbol_table_elements[i].constant;
+	}
+	return false;
+}
+
+void symbol_table_insert(char* var_type, char* var_name, bool is_const, bool is_initial, char* var_value){
 	// check if already found
-	if(in_symbol_table(var_name)) { 
+	if(symbol_table_contains(var_name)) { 
 		char err[100];
 		sprintf(err,"Redeclaration of already declared variable %s\n", var_name);
-		semantic_failure_param(err); return; 
+		semantic_error_with_msg(err); return; 
 	}
 	// check for type
 	int dtype = convert_name_type(var_type);
 	if(dtype == -1){
 		char err[100];
 		sprintf(err,"Unknown type for variable %s\n", var_name);
-		semantic_failure_param(err); return; 
+		semantic_error_with_msg(err); return; 
 	}
 	// check if const and not initialized
 	if(is_const && !is_initial){
 		char err[100];
 		sprintf(err,"type Const variable must be initialized immediately %s\n", var_name);
-		semantic_failure_param(err); return; 
+		semantic_error_with_msg(err); return; 
 	}
 
-	struct symbol_table_element new_element;
+	struct symbol_table new_element;
 	new_element.type = dtype;
-	new_element.intialized = is_initial;
+	new_element.initialized = is_initial;
 	new_element.constant = is_const;
 	new_element.used = false;
 	new_element.line_num = lineno;
@@ -335,7 +333,7 @@ void insert_in_sym_tab(char* var_type, char* var_name, bool is_const, bool is_in
 	
 	// insert a non-initialized element
 	if(!is_initial){
-		symbol_table[symbol_table_idx++] = new_element;
+		symbol_table_elements[symbol_table_idx++] = new_element;
 		return;
 	}
 
@@ -344,60 +342,60 @@ void insert_in_sym_tab(char* var_type, char* var_name, bool is_const, bool is_in
 		if(new_element.type != val_type){ 
 			char err[100];
 			sprintf(err,"(Type Mismatch): %s and %s are of different types\n", var_name, var_value);
-			semantic_failure_param(err); return;
+			semantic_error_with_msg(err); return;
 		}
 	}
 	// assign var to var
 	else{
-		if(!in_symbol_table(var_value)) { 
+		if(!symbol_table_contains(var_value)) { 
 			char err[100];
 			sprintf(err,"you assign %s to a not declared variable: %s\n",var_name, var_value);
-			semantic_failure_param(err); 
+			semantic_error_with_msg(err); 
 			return; 
 		}
 		
-		int v_type_int = get_type_from_sym_tab(var_value);
+		int v_type_int = symbol_table_get_varType(var_value);
 
 		if(v_type_int != new_element.type){ 
 			char err[100];
 			sprintf(err,"(Type Mismatch): %s and %s are of different types\n", var_name, var_value);
-			semantic_failure_param(err); return; 
+			semantic_error_with_msg(err); return; 
 		}
 
-		if(!is_intialized(var_value)) { 
+		if(!is_var_initialized(var_value)) { 
 			char err[100];
-			sprintf(err,"warning: you assign %s to a not intialized variable: %s\n", var_name, var_value);
-			semantic_failure_param(err);
+			sprintf(err,"warning: you assign %s to a not initialized variable: %s\n", var_name, var_value);
+			semantic_error_with_msg(err);
 		}
 
-		set_used_state_for_var(var_value);
+		set_var_used(var_value);
 	}
 	// insert an initialized element
-	new_element.intialized = true;
-	symbol_table[symbol_table_idx++] = new_element;
+	new_element.initialized = true;
+	symbol_table_elements[symbol_table_idx++] = new_element;
 }
 
-void set_intialized_state_for_var(char* var_name){
+void set_var_initialized(char* var_name){
 
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table[i].name);
+		int eq = strcmp(var_name, symbol_table_elements[i].name);
 
 		if(eq == 0)
 		{
-			symbol_table[i].intialized = true;
+			symbol_table_elements[i].initialized = true;
 			return;
 		}
 	}
 }
 
-void set_used_state_for_var(char* var_name){
+void set_var_used(char* var_name){
 
 	for(int i = 0; i < symbol_table_idx; i++) {
-		int eq = strcmp(var_name, symbol_table[i].name);
+		int eq = strcmp(var_name, symbol_table_elements[i].name);
 
 		if(eq == 0)
 		{
-			symbol_table[i].used = true;
+			symbol_table_elements[i].used = true;
 			return;
 		}
 	}
@@ -406,10 +404,10 @@ void set_used_state_for_var(char* var_name){
 bool check_type_match(char* x, char* y, int specified){
 	int x_type = check_val_type(x),y_type = check_val_type(y);
 	if(x_type == 5){
-		x_type = get_type_from_sym_tab(x);
+		x_type = symbol_table_get_varType(x);
 	}
 	if(y_type == 5){
-		y_type = get_type_from_sym_tab(y);
+		y_type = symbol_table_get_varType(y);
 	}
 	if (specified == -1) specified = x_type;
 	return (x_type == specified && specified == y_type);
@@ -461,63 +459,63 @@ int convert_name_type(char * var_type){
 
 void initialize_variable(char * var_name, char * value){
 	
-	if(!in_symbol_table(var_name)) { 
+	if(!symbol_table_contains(var_name)) { 
 		char err[100];
 		sprintf(err,"%s not declared\n", var_name);
-		semantic_failure_param(err); 
+		semantic_error_with_msg(err); 
 		return; 
 	}
 
-	if(is_constant(var_name)){
+	if(is_var_constant(var_name)){
 		char err[100];
 		sprintf(err,"Constant var can't be re-initialized %s\n", var_name);
-		semantic_failure_param(err); return; 
+		semantic_error_with_msg(err); return; 
 	}
 	
-	if(is_intialized(var_name)){
-		set_used_state_for_var(var_name);
+	if(is_var_initialized(var_name)){
+		set_var_used(var_name);
 	}
 
-	int var_type_int = get_type_from_sym_tab(var_name);
+	int var_type_int = symbol_table_get_varType(var_name);
 	int val_type = check_val_type(value);
 	if(val_type != 5){
 		if(var_type_int != val_type){ 
 			char err[100];
 			sprintf(err,"(Type Mismatch) %s and %s are of different types\n", var_name, value);
-			semantic_failure_param(err); return;
+			semantic_error_with_msg(err); return;
 		}
-		set_intialized_state_for_var(var_name);
+		set_var_initialized(var_name);
 	}
 	// assign var to var
 	else{
-		if(!in_symbol_table(value)) { 
+		if(!symbol_table_contains(value)) { 
 			char err[100];
 			sprintf(err,"you assign %s to a not declared variable %s\n",var_name ,value);
-			semantic_failure_param(err); 
+			semantic_error_with_msg(err); 
 			return; 
 		}
 
-		int v_type_int = get_type_from_sym_tab(value);
+		int v_type_int = symbol_table_get_varType(value);
 
 		if(v_type_int != var_type_int){ 
 			char err[100];
 			sprintf(err,"%s and %s are of different types\n", var_name, value);
-			semantic_failure_param(err); return; 
+			semantic_error_with_msg(err); return; 
 		}
 		
-		if(!is_intialized(value)) { 
+		if(!is_var_initialized(value)) { 
 			char err[100];
-			sprintf(err,"warning: you assign %s to a not intialized variable %s\n",var_name ,value);
-			semantic_failure_param(err);
+			sprintf(err,"warning: you assign %s to a not initialized variable %s\n",var_name ,value);
+			semantic_error_with_msg(err);
 		}
-		set_intialized_state_for_var(var_name);
+		set_var_initialized(var_name);
 	}
 }
 
 
 void print_symbol_table() {
 	for(int s = 0; s < symbol_table_idx; s++) {
-		printf("[%d] type: %s\tname: %s\tconst: %s\tinitialized: %s\tused: %s\tline#: %d\n", s+1, arr_type[symbol_table[s].type], symbol_table[s].name, symbol_table[s].constant ? "true" : "false", symbol_table[s].intialized? "true" : "false",symbol_table[s].used? "true" : "false",symbol_table[s].line_num);
+		printf("[%d] type: %s\tname: %s\tconst: %s\tinitialized: %s\tused: %s\tline#: %d\n", s+1, arr_type[symbol_table_elements[s].type], symbol_table_elements[s].name, symbol_table_elements[s].constant ? "true" : "false", symbol_table_elements[s].initialized? "true" : "false",symbol_table_elements[s].used? "true" : "false",symbol_table_elements[s].line_num);
 	}
 }
 
@@ -539,16 +537,16 @@ char* reverse_type_value(int ty){
 char* ALU(char op,char* x,char* y){
 	int y_type = check_val_type(y);
 	if(y_type == 5){
-		y_type = get_type_from_sym_tab(y);
+		y_type = symbol_table_get_varType(y);
 	}else if( op == '/' && atoi(y) == 0){
 		char err[100];
 		sprintf(err,"Warning: you might be dividing by zero\n");
-		semantic_failure_param(err);
+		semantic_error_with_msg(err);
 	}
 	return reverse_type_value(y_type);
 }
 
-void insert_quadruple(char* op, char* src1_passed, char* src2_passed, char* dst_passed, bool defer){
+void quadruple_insert(char* op, char* src1_passed, char* src2_passed, char* dst_passed, bool defer){
 	if(debug)printf("Quadruples: operator: %s, src1: %s, src2: %s, dst: %s\n",op,src1_passed,src2_passed,dst_passed);
 	char str_num[5];
 	char src1[10], src2[10], dst[10];
@@ -584,7 +582,7 @@ void insert_quadruple(char* op, char* src1_passed, char* src2_passed, char* dst_
 	}
 }
 
-void manageColon(){
+void manage_colon(){
 	char str_num[5];
 	struct Quadruple new_element;
 	// operation
@@ -641,7 +639,7 @@ void jump(bool switch_case, int to){
 	quadruples[quadruple_idx++] = new_element;
 }
 
-void addLabel(){
+void add_label(){
 	char str_num[5];
 	struct Quadruple new_element;
 	strcpy(new_element.src1, "");
@@ -678,29 +676,17 @@ void print_quadruples(){
 	printf("-------------------------End printttttttttt Quadruples-------------------------\n");
 }
 
-void semantic_failure(){
+void semantic_error(){
 	fprintf(stderr, "Semantic error at line %d\n", lineno);
 }
 
-void semantic_failure_param(char * err){
+void semantic_error_with_msg(char * err){
 	fprintf(stderr, "Semantic error at line %d | %s\n", lineno, err);
 }
 
 void yyerror(char*s){
-	//fprintf(stderr, "%s\n", s);
 	fprintf(stderr, "syntax error at line %d\n", lineno);
 }
-
-
-// void parse(FILE* fileInput)
-//     {
-//         yyin= fileInput;
-//         while(feof(yyin)==0)
-//         {
-//         yyparse();
-//         }
-//     }
-
 
 int main(int argc,char* argv[])
 {

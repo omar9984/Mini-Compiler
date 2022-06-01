@@ -11,7 +11,7 @@
 #else
 #define TOKEN(t) return(t);
 #endif
-int lineno= 0;
+int lineno= 1;
 void save_token();
 %}
 DIGIT 	[0-9]
