@@ -1,6 +1,14 @@
 int x;
 int y = 5;
-int u =8;
-while(x>4):{int z = 9;}
-repeat{int a = 4;}until(a>8):
-int q = 4;
+bool u = false;
+const double o = 4.4;
+if(u == true):
+{
+    y = 4;
+}elif(u == false):
+{
+    string O = "dsds";
+}else{
+    char b = '6';
+}
+end

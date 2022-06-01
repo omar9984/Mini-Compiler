@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_PARSER_TAB_H_INCLUDED
 # define YY_YY_PARSER_TAB_H_INCLUDED
@@ -44,52 +45,70 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    EQUAL = 258,
-    LOGIC_OR = 259,
-    LOGIC_AND = 260,
-    LOGIC_EQ = 261,
-    LOGIC_NEQ = 262,
-    LOGIC_LT = 263,
-    LOGIC_LEQ = 264,
-    LOGIC_GT = 265,
-    LOGIC_GEQ = 266,
-    PLUS = 267,
-    MINUS = 268,
-    MULT = 269,
-    DIV = 270,
-    VAR = 271,
-    ENDL = 272,
-    IF = 273,
-    ELIF = 274,
-    ELSE = 275,
-    FOR = 276,
-    WHILE = 277,
-    REPEAT = 278,
-    UNTIL = 279,
-    SWITCH = 280,
-    CASE = 281,
-    BREAK = 282,
-    DEFAULT = 283,
-    TYPE_INT = 284,
-    TYPE_CHAR = 285,
-    TYPE_CONST = 286,
-    TYPE_BOOL = 287,
-    TYPE_DOUBLE = 288,
-    INT_VALUE = 289,
-    DOUBLE_VALUE = 290,
-    FALSE_VALUE = 291,
-    TRUE_VALUE = 292
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    EQUAL = 258,                   /* EQUAL  */
+    LOGIC_OR = 259,                /* LOGIC_OR  */
+    LOGIC_AND = 260,               /* LOGIC_AND  */
+    LOGIC_EQ = 261,                /* LOGIC_EQ  */
+    LOGIC_NEQ = 262,               /* LOGIC_NEQ  */
+    LOGIC_LT = 263,                /* LOGIC_LT  */
+    LOGIC_LEQ = 264,               /* LOGIC_LEQ  */
+    LOGIC_GT = 265,                /* LOGIC_GT  */
+    LOGIC_GEQ = 266,               /* LOGIC_GEQ  */
+    PLUS = 267,                    /* PLUS  */
+    MINUS = 268,                   /* MINUS  */
+    MULT = 269,                    /* MULT  */
+    DIV = 270,                     /* DIV  */
+    VAR = 271,                     /* VAR  */
+    ENDL = 272,                    /* ENDL  */
+    COLON = 273,                   /* COLON  */
+    IF = 274,                      /* IF  */
+    ELIF = 275,                    /* ELIF  */
+    ELSE = 276,                    /* ELSE  */
+    FOR = 277,                     /* FOR  */
+    WHILE = 278,                   /* WHILE  */
+    REPEAT = 279,                  /* REPEAT  */
+    UNTIL = 280,                   /* UNTIL  */
+    SWITCH = 281,                  /* SWITCH  */
+    CASE = 282,                    /* CASE  */
+    DEFAULT = 283,                 /* DEFAULT  */
+    END = 284,                     /* END  */
+    TYPE_INT = 285,                /* TYPE_INT  */
+    TYPE_CHAR = 286,               /* TYPE_CHAR  */
+    TYPE_CONST = 287,              /* TYPE_CONST  */
+    TYPE_BOOL = 288,               /* TYPE_BOOL  */
+    TYPE_DOUBLE = 289,             /* TYPE_DOUBLE  */
+    TYPE_STRING = 290,             /* TYPE_STRING  */
+    INT_VALUE = 291,               /* INT_VALUE  */
+    DOUBLE_VALUE = 292,            /* DOUBLE_VALUE  */
+    FALSE_VALUE = 293,             /* FALSE_VALUE  */
+    TRUE_VALUE = 294,              /* TRUE_VALUE  */
+    CHAR_VALUE = 295,              /* CHAR_VALUE  */
+    STRING_VALUE = 296             /* STRING_VALUE  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 60 "./rules/parser.y"
+
+	char* token;
+
+#line 109 "parser.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -97,6 +116,8 @@ typedef int YYSTYPE;
 
 extern YYSTYPE yylval;
 
+
 int yyparse (void);
+
 
 #endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */

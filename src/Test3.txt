@@ -1,0 +1,9 @@
+switch(x){
+    case 1:
+        int y = 7;
+    case 5:
+        int u = 8;
+    case 9:
+        int p = 0;
+    default
+}
