@@ -27,6 +27,7 @@
 	void add_label();
 	void jump(bool,int);
 	void apply_defer();
+	void print_warning();
 
 
 	int i = 0;
@@ -180,7 +181,7 @@ block_statements:
 // expr is anything that can appear on the right hand side of expression
 expr:
 	const_val	//{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false); }	
-	| VAR	{if(debug){printf("%d VAR \n", i++);}quadruple_insert("=",$1,"NULL","t#",false); }	
+	| VAR	{if(debug){printf("%d VAR \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);set_var_used($1); }	
 	| expr PLUS expr {if(debug){printf("%d expr + expr  \n", i++);} if(check_type_match($1,$3,0)  || check_type_match($1,$3,1)) {$$ = ALU('+',$1,$3);quadruple_insert("+",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('-',$1,$3);quadruple_insert("-",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('*',$1,$3);quadruple_insert("*",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
@@ -671,6 +672,13 @@ void print_quadruples(){
 	printf("-------------------------End printttttttttt Quadruples-------------------------\n");
 }
 
+void print_warning(){
+	for(int i = 0; i < symbol_table_idx; i++){
+		if(!symbol_table_elements[i].initialized && symbol_table_elements[i].used)
+			printf("Warning! variable %s at line %d used without being initialized\n",symbol_table_elements[i].name,symbol_table_elements[i].line_num);
+	}
+}
+
 void semantic_error(){
 	fprintf(stderr, "Semantic error at line %d\n", lineno);
 }
@@ -681,18 +689,19 @@ void semantic_error_with_msg(char * err){
 
 void yyerror(char*s){
 	fprintf(stderr, "syntax error at line %d\n", lineno);
+	exit(1);
 }
 
 int main(int argc,char* argv[])
 {
-	int flag;
+	int syntax_err_found;
 	yyin = fopen(argv[1], "r");
-	flag = yyparse();
+	syntax_err_found = yyparse();
 	fclose(yyin);
 	
-	if(!flag) print_quadruples();
-
+	if(!syntax_err_found) print_quadruples();
 	print_symbol_table();
+	print_warning();
 	printf("end of parser\n");
 	return 0;
 }
