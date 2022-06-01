@@ -1,13 +1,5 @@
-parser.tab.c: In function ‘int yyparse()’:
-parser.tab.c:1783:20: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
- 1783 |       yyerror (YY_("syntax error"));
-      |                    ^~~~~~~~~~~~~~
-parser.tab.c:302:22: note: in definition of macro ‘YY_’
-  302 | #  define YY_(Msgid) Msgid
-      |                      ^~~~~
-parser.tab.c:1927:16: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
- 1927 |   yyerror (YY_("memory exhausted"));
-      |                ^~~~~~~~~~~~~~~~~~
-parser.tab.c:302:22: note: in definition of macro ‘YY_’
-  302 | #  define YY_(Msgid) Msgid
-      |                      ^~~~~
+int x;
+int y = 5;
+int u =8;
+while(x>4):{int z = 9;}
+repeat{int a = 4;}until(a>8):
