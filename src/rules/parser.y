@@ -53,7 +53,6 @@
 
 	struct Quadruple {
 		char dst[50], src1[50], src2[50], op[50];
-		char description[100];
 	};
 %} 
 
