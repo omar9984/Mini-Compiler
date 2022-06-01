@@ -38,6 +38,7 @@
 	int flag_until = 0;
 	int flag_case = 0;
 	int flag_last_case = 0;
+	bool semantic_error_found = false;
 	extern int lineno;
 	extern FILE *yyin;
 	const char* arr_type[5] = {"int","double","bool","char","string"};
@@ -82,7 +83,7 @@
 
 %%
 program:
-	program block_code {printf("matched okay");} // t=1;
+	program block_code {if(debug)printf("matched okay");} // t=1;
 	|
 	;
 block_code:
@@ -91,9 +92,10 @@ block_code:
 statement:
 	 expr ENDL
 	| typing VAR ENDL { if(debug){printf("%d typing VAR \n", i++);print_symbol_table();}symbol_table_insert($1,$2,false,false,"");  }
-	| Constant_type typing VAR EQUAL expr ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);print_symbol_table();} quadruple_insert("=","t#","NULL",$3,false); symbol_table_insert($2,$3,true,true,$5);}
-	| typing VAR EQUAL expr ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);print_symbol_table();} quadruple_insert("=","t#","NULL",$2,false); symbol_table_insert($1,$2,false,true,$4);}
-	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);print_symbol_table();}quadruple_insert("=","t#","NULL",$1,false); initialize_variable($1,$3);}
+	| Constant_type typing VAR ENDL {if(debug){printf("%d const typing VAR \n", i++);print_symbol_table();} symbol_table_insert($2,$3,true,false,"");}
+	| Constant_type typing VAR EQUAL expr ENDL {if(debug){printf("%d const typing VAR '=' const_val \n", i++);print_symbol_table();} symbol_table_insert($2,$3,true,true,$5); quadruple_insert("=","t#","NULL",$3,false);  }
+	| typing VAR EQUAL expr ENDL {if(debug){printf("%d typing VAR '=' const_val \n", i++);print_symbol_table();} symbol_table_insert($1,$2,false,true,$4); quadruple_insert("=","t#","NULL",$2,false); }
+	| VAR EQUAL expr ENDL {if(debug){printf("%d VAR EQUAL expr  \n", i++);print_symbol_table();}initialize_variable($1,$3);quadruple_insert("=","t#","NULL",$1,false); }
 	| if_clause '('expr')' colon if_block END  {if(debug){printf("%d if (expr) do expr  \n", i++);} add_label(); }
 	| if_clause '('expr')' colon if_block else_clause if_block END {if(debug){printf("%d if  (expr) else  do expr  \n", i++);} add_label(); }
 	| if_clause '('expr')' colon if_block elif_block else_clause if_block END {if (debug){printf("%d if ELIF ELSE expr  \n", i++);}flag_last_case = 1;add_label();flag_last_case = 0; }
@@ -108,7 +110,7 @@ statement:
 // for part
 
 for_inital:
-	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}quadruple_insert("=","t#","NULL",$1,false); initialize_variable($1,$3);}
+	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}initialize_variable($1,$3);quadruple_insert("=","t#","NULL",$1,false); }
 	//typing VAR EQUAL expr {if(debug){printf("%d For Initial: typing VAR EQUAL expr  \n", i++);}quadruple_insert("=","t#","NULL",$2,false); symbol_table_insert($1,$2,false,true,$4);print_symbol_table(); }
 	|
 	;
@@ -117,7 +119,7 @@ for_condition:
 	|
 	;
 for_inc:
-	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}quadruple_insert("=","t#","NULL",$1,true); initialize_variable($1,$3);}
+	VAR EQUAL expr {if(debug){printf("%d For Initial: VAR EQUAL expr  \n", i++);print_symbol_table();}initialize_variable($1,$3);quadruple_insert("=","t#","NULL",$1,true); }
 	|
 	;
 
@@ -181,7 +183,7 @@ block_statements:
 // expr is anything that can appear on the right hand side of expression
 expr:
 	const_val	//{if(debug){printf("%d const_val \n", i++);}quadruple_insert("=",$1,"NULL","t#",false); }	
-	| VAR	{if(debug){printf("%d VAR \n", i++);}quadruple_insert("=",$1,"NULL","t#",false);set_var_used($1); }	
+	| VAR	{if(debug){printf("%d VAR \n", i++);}if(symbol_table_contains($1)){quadruple_insert("=",$1,"NULL","t#",false);set_var_used($1);}else{char err[100];sprintf(err,"varaible %s is not declared\n", $1);semantic_error_with_msg(err);}}	
 	| expr PLUS expr {if(debug){printf("%d expr + expr  \n", i++);} if(check_type_match($1,$3,0)  || check_type_match($1,$3,1)) {$$ = ALU('+',$1,$3);quadruple_insert("+",$1,$3,"t#",false);}else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| expr MINUS expr {if(debug){printf("%d expr - expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('-',$1,$3);quadruple_insert("-",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
 	| expr MULT expr { if(debug){printf("%d expr * expr \n", i++);}  if(check_type_match($1,$3,0) || check_type_match($1,$3,1)){ $$ = ALU('*',$1,$3);quadruple_insert("*",$1,$3,"t#",false);} else{char err[100];sprintf(err,"two operands are of different types %s and %s\n", $1,$3);semantic_error_with_msg(err);}}
@@ -249,7 +251,7 @@ switch_clause:
 	SWITCH			{if(debug){printf("Type SWITCH recieved\n");}}
 	;
 case_clause:
-	CASE			{if(debug){printf("Type Case recieved\n");} if(!flag_case){t_reg=t-1;flag_case=1;}else{jump(true,+1); add_label();}printf("****flag_case = %d*****\n",flag_case);}
+	CASE			{if(debug){printf("Type Case recieved\n");} if(!flag_case){t_reg=t-1;flag_case=1;}else{jump(true,+1); add_label();}}
 	;
 default_clause:
 	DEFAULT			{if(debug){printf("Type Default recieved\n");} jump(true,+1); add_label();}
@@ -675,15 +677,15 @@ void print_quadruples(){
 void print_warning(){
 	for(int i = 0; i < symbol_table_idx; i++){
 		if(!symbol_table_elements[i].initialized && symbol_table_elements[i].used)
-			printf("Warning! variable %s at line %d used without being initialized\n",symbol_table_elements[i].name,symbol_table_elements[i].line_num);
+			printf("Warning! variable %s at line %d used without being initialized, contain garbage(Rubbish)\n",symbol_table_elements[i].name,symbol_table_elements[i].line_num);
+		if(!symbol_table_elements[i].used)
+			printf("Warning! variable %s at line %d is not used, please take care of your memory\n",symbol_table_elements[i].name,symbol_table_elements[i].line_num);
 	}
 }
 
-void semantic_error(){
-	fprintf(stderr, "Semantic error at line %d\n", lineno);
-}
 
 void semantic_error_with_msg(char * err){
+	semantic_error_found = true;
 	fprintf(stderr, "Semantic error at line %d | %s\n", lineno, err);
 }
 
@@ -699,7 +701,7 @@ int main(int argc,char* argv[])
 	syntax_err_found = yyparse();
 	fclose(yyin);
 	
-	if(!syntax_err_found) print_quadruples();
+	if(!syntax_err_found && !semantic_error_found) print_quadruples();
 	print_symbol_table();
 	print_warning();
 	printf("end of parser\n");
