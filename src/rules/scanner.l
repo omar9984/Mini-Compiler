@@ -21,24 +21,24 @@ DOUBLE	"0"|{DIGIT}+"."{DIGIT}+
 ASCII	[ -~]
 CHAR	(\'{ASCII}\')|(\'\\[nftrbv]\')
 STRING	\"{ASCII}*\"
+%x LINE
 %%
 
 %{
 // control structures
+// "break"   	{save_token(); return BREAK;}
 %}
-"if"      	return IF;
-"then"		return THEN;
-"elif"      return ELIF;
-"else" 		return ELSE;
-"while"	  	return WHILE;
-"for"     	return FOR;
-"switch"  	return SWITCH;
-"case"    	return CASE;
-"default" 	return DEFAULT;
-"break"   	return BREAK;
-"repeat"  	return REPEAT;
-"until"   	return UNTIL;
-
+"if"      	{save_token(); return IF;}
+"elif"      {save_token(); return ELIF;}
+"else" 		{save_token(); return ELSE;}
+"while"	  	{save_token(); return WHILE;}
+"for"     	{save_token(); return FOR;}
+"switch"  	{save_token(); return SWITCH;}
+"case"    	{save_token(); return CASE;}
+"default" 	{save_token(); return DEFAULT;}
+"repeat"  	{save_token(); return REPEAT;}
+"until"   	{save_token(); return UNTIL;}
+"end"   	{save_token(); return END;}
 %{
 // types
 %}
@@ -100,10 +100,12 @@ STRING	\"{ASCII}*\"
 {DOUBLE} 	{save_token(); return DOUBLE_VALUE;}
 {CHAR} 		{save_token(); return CHAR_VALUE;}
 {STRING} 	{save_token(); return STRING_VALUE;}
-[(){}:,] 	{save_token(); return *yytext;}
+[(){},] 	{save_token(); return *yytext;}
 [ \t]  		; /* skip whitespace */
+":"			{save_token(); return COLON;}
 ";" 		{save_token(); return ENDL;}
-'\n' 		{lineno++;}
+"\n" 		{lineno += 1;}
+<LINE>"\n"		{ lineno += 1; }
 .   {
 		printf("unknown %c", *yytext);
 		perror("Unknown character ");
